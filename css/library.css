@@ -1,0 +1,346 @@
+/* =====================================================
+   LIBRARY PAGE STYLES
+   ===================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: #f8fafc;
+    color: #1e293b;
+    min-height: 100vh;
+    display: flex;
+}
+
+/* ---- Sidebar (shared with index) ---- */
+.sidebar {
+    width: 256px;
+    background: #fff;
+    border-right: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    flex-shrink: 0;
+}
+.sidebar-logo {
+    padding: 24px;
+    font-size: 1.4rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #6366f1, #9333ea);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.sidebar-logo svg { color: #6366f1; -webkit-text-fill-color: initial; }
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-weight: 500;
+    color: #64748b;
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s;
+    margin-bottom: 4px;
+}
+.nav-link:hover { background: #f8fafc; color: #1e293b; }
+.nav-link.active { background: #eef2ff; color: #4f46e5; }
+.sidebar-nav { flex: 1; padding: 16px; margin-top: 16px; }
+.auth-section { padding: 16px; border-top: 1px solid #e2e8f0; }
+
+/* ---- Main content ---- */
+.main-content {
+    flex: 1;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+}
+.page-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+/* ---- New Quiz Button ---- */
+.btn-new-quiz {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #6366f1, #9333ea);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.2s, transform 0.15s;
+    box-shadow: 0 4px 14px rgba(99,102,241,0.35);
+}
+.btn-new-quiz:hover { opacity: 0.9; transform: translateY(-1px); }
+
+/* ---- Table Header ---- */
+.list-header {
+    display: flex;
+    align-items: center;
+    padding: 0 16px 10px;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+.list-header .col-title { flex: 1; }
+.list-header .col-code { width: 110px; text-align: center; }
+.list-header .col-date { width: 140px; text-align: right; }
+.list-header .col-actions { width: 130px; }
+
+/* ---- Quiz Card / List Item ---- */
+.quiz-list { display: flex; flex-direction: column; gap: 4px; }
+
+.quiz-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 16px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    transition: box-shadow 0.15s, border-color 0.15s;
+    position: relative;
+}
+.quiz-item:hover {
+    border-color: #c7d2fe;
+    box-shadow: 0 2px 12px rgba(99,102,241,0.08);
+}
+
+.quiz-icon {
+    width: 40px;
+    height: 40px;
+    background: #eef2ff;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: #6366f1;
+}
+
+.quiz-info { flex: 1; min-width: 0; }
+.quiz-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1e293b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.quiz-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 3px;
+    font-size: 0.75rem;
+    color: #64748b;
+}
+.quiz-meta span { display: flex; align-items: center; gap: 3px; }
+
+/* ---- Share Code Badge ---- */
+.quiz-code {
+    width: 110px;
+    text-align: center;
+    flex-shrink: 0;
+}
+.code-badge {
+    display: inline-block;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #475569;
+    font-family: 'Courier New', monospace;
+    cursor: pointer;
+    transition: background 0.15s;
+    user-select: all;
+}
+.code-badge:hover { background: #e0e7ff; color: #4f46e5; }
+.code-badge.copied { background: #dcfce7; color: #16a34a; border-color: #86efac; }
+
+/* ---- Date column ---- */
+.quiz-date {
+    width: 140px;
+    text-align: right;
+    font-size: 0.8rem;
+    color: #94a3b8;
+    flex-shrink: 0;
+}
+
+/* ---- Action Buttons ---- */
+.quiz-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 130px;
+    flex-shrink: 0;
+    justify-content: flex-end;
+}
+.btn-play {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 14px;
+    background: #6366f1;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    text-decoration: none;
+}
+.btn-play:hover { background: #4f46e5; }
+
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e2e8f0;
+    background: #fff;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #64748b;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    position: relative;
+}
+.btn-icon:hover { background: #f8fafc; color: #1e293b; border-color: #cbd5e1; }
+
+/* ---- Dropdown Menu ---- */
+.dropdown { position: relative; }
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 6px);
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    z-index: 50;
+    min-width: 160px;
+    overflow: hidden;
+}
+.dropdown-menu.open { display: block; }
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #475569;
+    cursor: pointer;
+    transition: background 0.1s;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+}
+.dropdown-item:hover { background: #f8fafc; color: #1e293b; }
+.dropdown-item.danger { color: #ef4444; }
+.dropdown-item.danger:hover { background: #fef2f2; }
+
+/* ---- Skeleton Loader ---- */
+.skeleton {
+    background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite;
+    border-radius: 8px;
+}
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+.skeleton-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 16px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    margin-bottom: 4px;
+}
+
+/* ---- Empty State ---- */
+.empty-state {
+    text-align: center;
+    padding: 64px 24px;
+    color: #94a3b8;
+}
+.empty-state svg { margin: 0 auto 16px; color: #cbd5e1; }
+.empty-state h3 { font-size: 1.1rem; font-weight: 600; color: #64748b; margin-bottom: 8px; }
+.empty-state p { font-size: 0.9rem; }
+
+/* ---- Login Prompt ---- */
+.login-prompt {
+    text-align: center;
+    padding: 80px 24px;
+}
+.login-prompt h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 8px; }
+.login-prompt p { color: #64748b; margin-bottom: 24px; }
+.btn-login {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    background: linear-gradient(135deg, #6366f1, #9333ea);
+    color: #fff;
+    border-radius: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(99,102,241,0.35);
+    transition: opacity 0.2s;
+}
+.btn-login:hover { opacity: 0.9; }
+
+/* ---- Toast ---- */
+.toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: #1e293b;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    z-index: 999;
+    pointer-events: none;
+}
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
