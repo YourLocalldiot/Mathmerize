@@ -3,105 +3,232 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Math Quiz Master</title>
-    
+    <title>Math Quiz — Mathmerize</title>
+
     <!-- External Dependencies -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mathquill/0.10.1/mathquill.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathquill/0.10.1/mathquill.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- KaTeX for rendering static questions -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css">
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script>
 
-    <link rel="stylesheet" href="css/quiz.css">
+    <link rel="stylesheet" href="../css/quiz.css">
+
+    <style>
+        /* ---- Sidebar (mirrors index.html) ---- */
+        body { display: flex; min-height: 100vh; background: #f8fafc; }
+
+        .sidebar {
+            width: 256px;
+            background: #fff;
+            border-right: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            flex-shrink: 0;
+        }
+        .sidebar-logo {
+            padding: 24px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #6366f1, #9333ea);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .sidebar-logo svg { color: #6366f1; -webkit-text-fill-color: initial; }
+        .nav-link {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 16px; border-radius: 12px;
+            font-weight: 500; color: #64748b; text-decoration: none;
+            transition: background 0.15s, color 0.15s; margin-bottom: 4px;
+        }
+        .nav-link:hover { background: #f8fafc; color: #1e293b; }
+        .nav-link.active { background: #eef2ff; color: #4f46e5; }
+        .sidebar-nav { flex: 1; padding: 16px; margin-top: 16px; }
+        .auth-section { padding: 16px; border-top: 1px solid #e2e8f0; }
+
+        /* ---- Quiz area ---- */
+        .quiz-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        /* ---- Loading overlay ---- */
+        #quiz-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+        .spinner {
+            width: 36px; height: 36px;
+            border: 3px solid #e2e8f0;
+            border-top-color: #6366f1;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Skeleton pulse for auth */
+        .skeleton { background: linear-gradient(90deg,#f1f5f9 25%,#e2e8f0 50%,#f1f5f9 75%); background-size:200% 100%; animation: shimmer 1.4s infinite; border-radius: 8px; }
+        @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-2 sm:p-4">
+<body>
 
-    <!-- Top Disclaimer Bar -->
-    <div class="w-full max-w-xl mb-4 py-2 px-4 bg-slate-200/50 rounded-lg border border-slate-300 text-center">
-        <p class="text-[10px] sm:text-xs text-slate-600 font-medium italic">
-            If you know an answer is wrong, that means you are smarter than the guy who made this quiz. Kudos!
-        </p>
-    </div>
-
-    <div class="w-full max-w-xl bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
-        <div class="h-1.5 bg-slate-100 w-full">
-            <div id="progress-bar" class="h-full bg-indigo-500 transition-all duration-500" style="width: 0%"></div>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+            </svg>
+            Mathmerize
         </div>
 
-        <div class="p-4 sm:p-6 pb-4">
-            <div class="flex justify-between items-center mb-4">
-                <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest">Question <span id="q-number">1</span> / <span id="total-q"></span></span>
-                <span class="text-[10px] sm:text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">Score: <span id="score">0</span></span>
+        <nav class="sidebar-nav">
+            <a href="../index.html" class="nav-link">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                </svg>
+                Home
+            </a>
+            <a href="library.html" class="nav-link">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                </svg>
+                Library
+            </a>
+        </nav>
+
+        <div class="auth-section" id="auth-container">
+            <!-- Skeleton -->
+            <div style="display:flex;align-items:center;gap:12px;" id="auth-skeleton">
+                <div class="skeleton" style="width:38px;height:38px;border-radius:50%;flex-shrink:0;"></div>
+                <div style="flex:1;">
+                    <div class="skeleton" style="height:13px;width:70%;margin-bottom:6px;"></div>
+                    <div class="skeleton" style="height:11px;width:50%;"></div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Quiz Main Area -->
+    <div class="quiz-main">
+
+        <!-- Loading state (shown while Firestore loads) -->
+        <div id="quiz-loading" style="display:none;">
+            <div class="spinner"></div>
+            <span>Loading quiz…</span>
+        </div>
+
+        <!-- Quiz wrapper (hidden until data is ready) -->
+        <div id="quiz-wrapper" style="width:100%;max-width:576px;display:none;">
+            <!-- Disclaimer -->
+            <div class="w-full mb-4 py-2 px-4 bg-slate-200/50 rounded-lg border border-slate-300 text-center">
+                <p class="text-[10px] sm:text-xs text-slate-600 font-medium italic" id="quiz-disclaimer">
+                    If you know an answer is wrong, that means you are smarter than the guy who made this quiz. Kudos!
+                </p>
             </div>
 
-            <div class="text-center mb-4 sm:mb-6 min-h-[90px] flex flex-col justify-center bg-slate-50 rounded-xl border border-slate-100 p-3">
-                <h2 id="question-prompt" class="text-[11px] sm:text-[13px] font-bold text-slate-700 mb-1 uppercase tracking-wider"></h2>
-                <div id="question-display" class="text-xl sm:text-2xl font-bold text-slate-800"></div>
+            <div class="w-full bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
+                <div class="h-1.5 bg-slate-100 w-full">
+                    <div id="progress-bar" class="h-full bg-indigo-500 transition-all duration-500" style="width: 0%"></div>
+                </div>
+
+                <div class="p-4 sm:p-6 pb-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest">
+                            Question <span id="q-number">1</span> / <span id="total-q"></span>
+                        </span>
+                        <span class="text-[10px] sm:text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">
+                            Score: <span id="score">0</span>
+                        </span>
+                    </div>
+
+                    <div class="text-center mb-4 sm:mb-6 min-h-[90px] flex flex-col justify-center bg-slate-50 rounded-xl border border-slate-100 p-3">
+                        <h2 id="question-prompt" class="text-[11px] sm:text-[13px] font-bold text-slate-700 mb-1 uppercase tracking-wider"></h2>
+                        <div id="question-display" class="text-xl sm:text-2xl font-bold text-slate-800"></div>
+                    </div>
+
+                    <div id="math-field"></div>
+
+                    <div class="keypad-container">
+                        <!-- Row 1: Structures -->
+                        <button class="keypad-btn" data-cmd="^2"><div class="flex items-start"><span class="box-icon"></span><span class="text-[9px] -mt-1">2</span></div></button>
+                        <button class="keypad-btn" data-cmd="^"><div class="flex items-start"><span class="box-icon"></span><span class="box-icon scale-75 -mt-1"></span></div></button>
+                        <button class="keypad-btn" data-cmd="\sqrt"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12l3 7 4-14h11"/></svg></button>
+                        <button class="keypad-btn" data-cmd="\frac"><div class="flex flex-col items-center gap-0.5"><span class="box-icon scale-75"></span><div class="w-3 h-[1.5px] bg-slate-600"></div><span class="box-icon scale-75"></span></div></button>
+                        <button class="keypad-btn operator" data-cmd="(">(</button>
+                        <button class="keypad-btn operator" data-cmd=")">)</button>
+
+                        <!-- Row 2: Trig -->
+                        <button class="keypad-btn italic" data-cmd="\sin">sin</button>
+                        <button class="keypad-btn italic" data-cmd="\cos">cos</button>
+                        <button class="keypad-btn italic" data-cmd="\tan">tan</button>
+                        <button class="keypad-btn font-serif" data-cmd="\pi">π</button>
+                        <button class="keypad-btn font-serif" data-cmd="e">e</button>
+                        <button class="keypad-btn italic font-serif" data-cmd="x">x</button>
+
+                        <!-- Row 3: Reciprocal & Adv -->
+                        <button class="keypad-btn italic" data-cmd="\csc">csc</button>
+                        <button class="keypad-btn italic" data-cmd="\sec">sec</button>
+                        <button class="keypad-btn italic" data-cmd="\cot">cot</button>
+                        <button class="keypad-btn italic" data-cmd="\ln">ln</button>
+                        <button class="keypad-btn" data-cmd="\lim_{x \to }">lim</button>
+                        <button class="keypad-btn action" id="backspace-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/></svg></button>
+
+                        <!-- Row 4: Numbers -->
+                        <button class="keypad-btn num-btn" data-cmd="7">7</button>
+                        <button class="keypad-btn num-btn" data-cmd="8">8</button>
+                        <button class="keypad-btn num-btn" data-cmd="9">9</button>
+                        <button class="keypad-btn operator" data-cmd="/">÷</button>
+                        <button class="keypad-btn operator" data-cmd="\times">×</button>
+                        <button class="keypad-btn operator" data-cmd="-">−</button>
+
+                        <!-- Row 5: Numbers -->
+                        <button class="keypad-btn num-btn" data-cmd="4">4</button>
+                        <button class="keypad-btn num-btn" data-cmd="5">5</button>
+                        <button class="keypad-btn num-btn" data-cmd="6">6</button>
+                        <button class="keypad-btn operator" data-cmd="+">+</button>
+                        <button class="keypad-btn num-btn" data-cmd=".">.</button>
+                        <button class="keypad-btn operator" data-cmd="=">=</button>
+
+                        <!-- Row 6: Numbers -->
+                        <button class="keypad-btn num-btn" data-cmd="1">1</button>
+                        <button class="keypad-btn num-btn" data-cmd="2">2</button>
+                        <button class="keypad-btn num-btn" data-cmd="3">3</button>
+                        <button class="keypad-btn num-btn" data-cmd="0">0</button>
+                        <button class="keypad-btn italic font-serif" data-cmd="z">z</button>
+                        <button class="keypad-btn italic font-serif" data-cmd="a">a</button>
+                    </div>
+
+                    <button id="submit-btn" class="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 sm:py-4 rounded-xl transition-all shadow-lg active:transform active:scale-[0.98]">
+                        Check Result
+                    </button>
+
+                    <div id="feedback" class="mt-3 text-center h-5 font-semibold text-xs"></div>
+                </div>
             </div>
-
-            <div id="math-field"></div>
-            
-            <div class="keypad-container">
-                <!-- Row 1: Structures -->
-                <button class="keypad-btn" data-cmd="^2"><div class="flex items-start"><span class="box-icon"></span><span class="text-[9px] -mt-1">2</span></div></button>
-                <button class="keypad-btn" data-cmd="^"><div class="flex items-start"><span class="box-icon"></span><span class="box-icon scale-75 -mt-1"></span></div></button>
-                <button class="keypad-btn" data-cmd="\sqrt"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12l3 7 4-14h11"/></svg></button>
-                <button class="keypad-btn" data-cmd="\frac"><div class="flex flex-col items-center gap-0.5"><span class="box-icon scale-75"></span><div class="w-3 h-[1.5px] bg-slate-600"></div><span class="box-icon scale-75"></span></div></button>
-                <button class="keypad-btn operator" data-cmd="(">(</button>
-                <button class="keypad-btn operator" data-cmd=")">)</button>
-
-                <!-- Row 2: Trig -->
-                <button class="keypad-btn italic" data-cmd="\sin">sin</button>
-                <button class="keypad-btn italic" data-cmd="\cos">cos</button>
-                <button class="keypad-btn italic" data-cmd="\tan">tan</button>
-                <button class="keypad-btn font-serif" data-cmd="\pi">π</button>
-                <button class="keypad-btn font-serif" data-cmd="e">e</button>
-                <button class="keypad-btn italic font-serif" data-cmd="x">x</button>
-
-                <!-- Row 3: Reciprocal & Adv -->
-                <button class="keypad-btn italic" data-cmd="\csc">csc</button>
-                <button class="keypad-btn italic" data-cmd="\sec">sec</button>
-                <button class="keypad-btn italic" data-cmd="\cot">cot</button>
-                <button class="keypad-btn italic" data-cmd="\ln">ln</button>
-                <button class="keypad-btn" data-cmd="\lim_{x \to }">lim</button>
-                <button class="keypad-btn action" id="backspace-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/></svg></button>
-
-                <!-- Row 4: Numbers -->
-                <button class="keypad-btn num-btn" data-cmd="7">7</button>
-                <button class="keypad-btn num-btn" data-cmd="8">8</button>
-                <button class="keypad-btn num-btn" data-cmd="9">9</button>
-                <button class="keypad-btn operator" data-cmd="/">÷</button>
-                <button class="keypad-btn operator" data-cmd="\times">×</button>
-                <button class="keypad-btn operator" data-cmd="-">−</button>
-
-                <!-- Row 5: Numbers -->
-                <button class="keypad-btn num-btn" data-cmd="4">4</button>
-                <button class="keypad-btn num-btn" data-cmd="5">5</button>
-                <button class="keypad-btn num-btn" data-cmd="6">6</button>
-                <button class="keypad-btn operator" data-cmd="+">+</button>
-                <button class="keypad-btn num-btn" data-cmd=".">.</button>
-                <button class="keypad-btn operator" data-cmd="=">=</button>
-
-                <!-- Row 6: Numbers -->
-                <button class="keypad-btn num-btn" data-cmd="1">1</button>
-                <button class="keypad-btn num-btn" data-cmd="2">2</button>
-                <button class="keypad-btn num-btn" data-cmd="3">3</button>
-                <button class="keypad-btn num-btn" data-cmd="0">0</button>
-                <button class="keypad-btn italic font-serif" data-cmd="z">z</button>
-                <button class="keypad-btn italic font-serif" data-cmd="a">a</button>
-            </div>
-
-            <button id="submit-btn" class="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 sm:py-4 rounded-xl transition-all shadow-lg active:transform active:scale-[0.98]">
-                Check Result
-            </button>
-
-            <div id="feedback" class="mt-3 text-center h-5 font-semibold text-xs"></div>
         </div>
     </div>
 
-    <script src="js/quiz.js"></script>
+    <script type="module" src="../js/quiz.js"></script>
 </body>
 </html>
