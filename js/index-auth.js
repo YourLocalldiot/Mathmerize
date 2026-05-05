@@ -13,11 +13,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             authContainer.innerHTML = `
                 <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-lg">
+                    <div class="auth-user-info flex items-center gap-3">
+                        <div class="auth-avatar w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-lg">
                             ${initial}
                         </div>
-                        <div class="overflow-hidden">
+                        <div class="auth-user-text overflow-hidden">
                             <p class="text-sm font-semibold text-slate-800 truncate">${displayName}</p>
                             <p class="text-xs text-slate-500 truncate" title="${email}">${email}</p>
                         </div>

@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="../css/quiz.css">
 
     <style>
-        /* ---- Sidebar (mirrors index.html) ---- */
+        /* ---- Sidebar ---- */
         body { display: flex; min-height: 100vh; background: #f8fafc; }
 
         .sidebar {
@@ -31,10 +31,21 @@
             position: sticky;
             top: 0;
             flex-shrink: 0;
+            transition: width 0.25s cubic-bezier(.4,0,.2,1);
+            overflow: hidden;
+        }
+        .sidebar.collapsed { width: 64px; }
+
+        /* Header row: logo on left, toggle on right */
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            min-height: 64px;
         }
         .sidebar-logo {
-            padding: 24px;
-            font-size: 1.4rem;
+            font-size: 1.25rem;
             font-weight: 700;
             background: linear-gradient(135deg, #6366f1, #9333ea);
             -webkit-background-clip: text;
@@ -42,18 +53,61 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            white-space: nowrap;
+            overflow: hidden;
         }
-        .sidebar-logo svg { color: #6366f1; -webkit-text-fill-color: initial; }
+        /* The icon inside .sidebar-logo must escape the gradient clip */
+        .sidebar-logo .logo-icon {
+            color: #6366f1;
+            -webkit-text-fill-color: initial;
+            flex-shrink: 0;
+        }
+        .sidebar-logo-text { transition: opacity 0.2s; overflow: hidden; }
+        .sidebar.collapsed .sidebar-logo-text { opacity: 0; width: 0; }
+
+        /* Toggle button — sibling of .sidebar-logo, not inside it */
+        .sidebar-toggle {
+            flex-shrink: 0;
+            background: none;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            width: 28px; height: 28px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            color: #64748b;
+            transition: background 0.15s, color 0.15s, border-color 0.15s;
+        }
+        .sidebar-toggle:hover { background: #f1f5f9; color: #4f46e5; border-color: #c7d2fe; }
+        .sidebar-toggle svg { transition: transform 0.25s; stroke: currentColor; }
+        .sidebar.collapsed .sidebar-toggle svg { transform: rotate(180deg); }
+
+        /* Nav links */
         .nav-link {
             display: flex; align-items: center; gap: 12px;
             padding: 12px 16px; border-radius: 12px;
             font-weight: 500; color: #64748b; text-decoration: none;
             transition: background 0.15s, color 0.15s; margin-bottom: 4px;
+            white-space: nowrap; overflow: hidden;
         }
         .nav-link:hover { background: #f8fafc; color: #1e293b; }
         .nav-link.active { background: #eef2ff; color: #4f46e5; }
-        .sidebar-nav { flex: 1; padding: 16px; margin-top: 16px; }
+        .nav-link svg { flex-shrink: 0; }
+        .nav-link span { transition: opacity 0.2s; }
+        .sidebar.collapsed .nav-link span { opacity: 0; }
+        /* Center icons when collapsed */
+        .sidebar.collapsed .nav-link { justify-content: center; padding: 12px; }
+        .sidebar-nav { flex: 1; padding: 16px; margin-top: 0; }
+
+        /* Auth section */
         .auth-section { padding: 16px; border-top: 1px solid #e2e8f0; }
+        /* Collapsed: center avatar, hide text + logout */
+        .sidebar.collapsed .auth-section { display: flex; align-items: center; justify-content: center; }
+        .sidebar.collapsed .auth-section .auth-user-info { justify-content: center; }
+        .sidebar.collapsed .auth-section .auth-user-text { display: none; }
+        .sidebar.collapsed .auth-section #logout-btn { display: none; }
+        /* Also center the login button when collapsed */
+        .sidebar.collapsed .auth-section a { padding: 8px; justify-content: center; }
+        .sidebar.collapsed .auth-section a span { display: none; }
 
         /* ---- Quiz area ---- */
         .quiz-main {
@@ -91,29 +145,37 @@
 <body>
 
     <!-- Sidebar -->
-    <aside class="sidebar">
-        <div class="sidebar-logo">
-            <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-            </svg>
-            Mathmerize
+    <aside class="sidebar" id="main-sidebar">
+        <!-- Header: logo left, toggle right -->
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <svg class="logo-icon" width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                </svg>
+                <span class="sidebar-logo-text">Mathmerize</span>
+            </div>
+            <button class="sidebar-toggle" id="sidebar-toggle" title="Toggle sidebar">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+            </button>
         </div>
 
         <nav class="sidebar-nav">
             <a href="../index.html" class="nav-link">
-                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                 </svg>
-                Home
+                <span>Home</span>
             </a>
             <a href="library.html" class="nav-link">
-                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                        d="M8 14v-4a4 4 0 018 0v4M5 20h14a2 2 0 002-2v-1a2 2 0 00-2-2H5a2 2 0 00-2 2v1a2 2 0 002 2z"/>
                 </svg>
-                Library
+                <span>Library</span>
             </a>
         </nav>
 
@@ -223,6 +285,11 @@
                         Check Result
                     </button>
 
+                    <button id="reveal-btn" class="w-full mt-2 bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-300 text-slate-600 hover:text-slate-800 font-semibold py-2.5 rounded-xl transition-all text-sm flex items-center justify-center gap-2">
+                        <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        Reveal Answer
+                    </button>
+
                     <div id="feedback" class="mt-3 text-center h-5 font-semibold text-xs"></div>
                 </div>
             </div>
@@ -230,5 +297,16 @@
     </div>
 
     <script type="module" src="../js/quiz.js"></script>
+    <script>
+        // Sidebar toggle
+        const sidebar = document.getElementById('main-sidebar');
+        const toggleBtn = document.getElementById('sidebar-toggle');
+        const COLLAPSED_KEY = 'sidebar-collapsed';
+        if (localStorage.getItem(COLLAPSED_KEY) === 'true') sidebar.classList.add('collapsed');
+        toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            localStorage.setItem(COLLAPSED_KEY, sidebar.classList.contains('collapsed'));
+        });
+    </script>
 </body>
 </html>

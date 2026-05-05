@@ -23,8 +23,8 @@ const FALLBACK_QUIZ = [
     // Angle Sum/Difference
     { prompt: "Expand the expression", text: "\\sin(x+z)", answer: "\\sin(x)\\cos(z)+\\cos(x)\\sin(z)" },
     { prompt: "Expand the expression", text: "\\sin(x-z)", answer: "\\sin(x)\\cos(z)-\\cos(x)\\sin(z)" },
-    { prompt: "Expand the expression", text: "\\cos(x+z)", answer: "\\cos(x)\\cos(z)+\\sin(x)\\sin(z)" },
-    { prompt: "Expand the expression", text: "\\cos(x-z)", answer: "\\cos(x)\\cos(z)-\\sin(x)\\sin(z)" },
+    { prompt: "Expand the expression", text: "\\cos(x+z)", answer: "\\cos(x)\\cos(z)-\\sin(x)\\sin(z)" },
+    { prompt: "Expand the expression", text: "\\cos(x-z)", answer: "\\cos(x)\\cos(z)+\\sin(x)\\sin(z)" },
     { prompt: "Expand the expression", text: "\\tan(x+z)", answer: "\\frac{\\tan(x)+\\tan(z)}{1-\\tan(x)\\tan(z)}" },
     { prompt: "Expand the expression", text: "\\tan(x-z)", answer: "\\frac{\\tan(x)-\\tan(z)}{1+\\tan(x)\\tan(z)}" },
     // Co-function Identities
@@ -59,11 +59,11 @@ function renderAuthSection(user) {
         const email = user.email || '';
         container.innerHTML = `
             <div style="display:flex;align-items:center;justify-content:space-between;">
-                <div style="display:flex;align-items:center;gap:10px;min-width:0;">
-                    <div style="width:38px;height:38px;border-radius:50%;background:#eef2ff;color:#4f46e5;display:flex;align-items:center;justify-content:justify-content:center;font-weight:700;font-size:1rem;flex-shrink:0;">
+                <div class="auth-user-info" style="display:flex;align-items:center;gap:10px;min-width:0;">
+                    <div class="auth-avatar" style="width:38px;height:38px;border-radius:50%;background:#eef2ff;color:#4f46e5;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1rem;flex-shrink:0;">
                         ${initial}
                     </div>
-                    <div style="min-width:0;overflow:hidden;">
+                    <div class="auth-user-text" style="min-width:0;overflow:hidden;">
                         <p style="font-size:0.875rem;font-weight:600;color:#1e293b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${displayName}</p>
                         <p style="font-size:0.75rem;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${email}</p>
                     </div>
@@ -169,6 +169,22 @@ function initQuiz(quizData) {
         }
     }
 
+    function revealAnswer() {
+        const answerLatex = quizData[currentIndex].answer;
+        const feedbackEl = document.getElementById('feedback');
+        feedbackEl.style.color = '#b45309';
+        feedbackEl.style.height = 'auto';
+        feedbackEl.innerHTML = 'Answer: <span id="reveal-katex"></span>';
+        try {
+            katex.render(answerLatex, document.getElementById('reveal-katex'), { throwOnError: false });
+        } catch(e) {
+            document.getElementById('reveal-katex').textContent = answerLatex;
+        }
+        // Clear the field so the student types the answer themselves
+        mathField.latex('');
+        mathField.focus();
+    }
+
     function updateProgressBar() {
         $('#progress-bar').css('width', (currentIndex / totalQ) * 100 + '%');
     }
@@ -210,6 +226,7 @@ function initQuiz(quizData) {
     });
 
     $('#submit-btn').on('click', checkAnswer);
+    $('#reveal-btn').on('click', revealAnswer);
     setTimeout(() => mathField.focus(), 500);
     loadQuestion();
 }

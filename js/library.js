@@ -92,11 +92,11 @@ function renderAuthSection(user) {
         const email = user.email || '';
         container.innerHTML = `
             <div style="display:flex;align-items:center;justify-content:space-between;">
-                <div style="display:flex;align-items:center;gap:10px;min-width:0;">
-                    <div style="width:38px;height:38px;border-radius:50%;background:#eef2ff;color:#4f46e5;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1rem;flex-shrink:0;">
+                <div class="auth-user-info" style="display:flex;align-items:center;gap:10px;min-width:0;">
+                    <div class="auth-avatar" style="width:38px;height:38px;border-radius:50%;background:#eef2ff;color:#4f46e5;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1rem;flex-shrink:0;">
                         ${initial}
                     </div>
-                    <div style="min-width:0;overflow:hidden;">
+                    <div class="auth-user-text" style="min-width:0;overflow:hidden;">
                         <p style="font-size:0.875rem;font-weight:600;color:#1e293b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${displayName}</p>
                         <p style="font-size:0.75rem;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${email}">${email}</p>
                     </div>

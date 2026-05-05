@@ -11,24 +11,27 @@
 <body class="min-h-screen flex text-slate-800">
 
     <!-- Sidebar -->
-    <aside class="w-64 bg-white border-r border-slate-200 flex flex-col h-screen sticky top-0">
-        <!-- Logo -->
-        <div class="p-6">
-            <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-600 tracking-tight flex items-center gap-2">
-                <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-                Mathmerize
-            </h1>
+    <aside id="main-sidebar" class="w-64 bg-white border-r border-slate-200 flex flex-col h-screen sticky top-0 flex-shrink-0 overflow-hidden" style="transition: width 0.25s cubic-bezier(.4,0,.2,1);">
+        <!-- Header: logo left, toggle right -->
+        <div class="flex items-center justify-between gap-2 px-4 py-4 min-h-[64px]">
+            <div class="flex items-center gap-2 overflow-hidden whitespace-nowrap">
+                <svg class="w-7 h-7 text-indigo-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                <span id="sidebar-logo-text" class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-600 tracking-tight" style="transition:opacity 0.2s;">Mathmerize</span>
+            </div>
+            <button id="sidebar-toggle" title="Toggle sidebar" class="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-indigo-600 hover:border-indigo-200 transition-all">
+                <svg id="sidebar-toggle-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="transition:transform 0.25s;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            </button>
         </div>
 
         <!-- Navigation -->
-        <nav class="flex-1 px-4 space-y-2 mt-4">
-            <a href="#" class="flex items-center gap-3 px-4 py-3 bg-indigo-50 text-indigo-600 rounded-xl font-medium transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                Home
+        <nav class="flex-1 px-4 space-y-2">
+            <a href="#" class="flex items-center gap-3 px-4 py-3 bg-indigo-50 text-indigo-600 rounded-xl font-medium transition-colors overflow-hidden whitespace-nowrap">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                <span class="sidebar-link-text" style="transition:opacity 0.2s;">Home</span>
             </a>
-            <a href="pages/library.html" class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl font-medium transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                Library
+            <a href="pages/library.html" class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl font-medium transition-colors overflow-hidden whitespace-nowrap">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v-4a4 4 0 018 0v4M5 20h14a2 2 0 002-2v-1a2 2 0 00-2-2H5a2 2 0 00-2 2v1a2 2 0 002 2z"></path></svg>
+                <span class="sidebar-link-text" style="transition:opacity 0.2s;">Library</span>
             </a>
         </nav>
 
@@ -90,5 +93,57 @@
     </main>
 
     <script type="module" src="js/index-auth.js"></script>
+    <script>
+        const sidebar = document.getElementById('main-sidebar');
+        const toggleBtn = document.getElementById('sidebar-toggle');
+        const toggleIcon = document.getElementById('sidebar-toggle-icon');
+        const logoText = document.getElementById('sidebar-logo-text');
+        const linkTexts = document.querySelectorAll('.sidebar-link-text');
+        const COLLAPSED_KEY = 'sidebar-collapsed';
+
+        function applyCollapsed(collapsed) {
+            if (collapsed) {
+                sidebar.style.width = '64px';
+                logoText.style.opacity = '0';
+                linkTexts.forEach(el => el.style.opacity = '0');
+                toggleIcon.style.transform = 'rotate(180deg)';
+                // Collapsed nav links: center icon
+                sidebar.querySelectorAll('nav a').forEach(a => {
+                    a.style.justifyContent = 'center';
+                    a.style.padding = '12px';
+                });
+                // Auth: hide text/logout, show only avatar
+                const authText = sidebar.querySelector('.auth-user-text');
+                const logoutBtn = sidebar.querySelector('#logout-btn');
+                if (authText) authText.style.display = 'none';
+                if (logoutBtn) logoutBtn.style.display = 'none';
+                const authContainer = sidebar.querySelector('#auth-container');
+                if (authContainer) { authContainer.style.display = 'flex'; authContainer.style.justifyContent = 'center'; }
+            } else {
+                sidebar.style.width = '256px';
+                logoText.style.opacity = '1';
+                linkTexts.forEach(el => el.style.opacity = '1');
+                toggleIcon.style.transform = 'rotate(0deg)';
+                sidebar.querySelectorAll('nav a').forEach(a => {
+                    a.style.justifyContent = '';
+                    a.style.padding = '';
+                });
+                const authText = sidebar.querySelector('.auth-user-text');
+                const logoutBtn = sidebar.querySelector('#logout-btn');
+                if (authText) authText.style.display = '';
+                if (logoutBtn) logoutBtn.style.display = '';
+                const authContainer = sidebar.querySelector('#auth-container');
+                if (authContainer) { authContainer.style.display = ''; authContainer.style.justifyContent = ''; }
+            }
+        }
+
+        applyCollapsed(localStorage.getItem(COLLAPSED_KEY) === 'true');
+
+        toggleBtn.addEventListener('click', () => {
+            const isNowCollapsed = sidebar.style.width !== '64px';
+            applyCollapsed(isNowCollapsed);
+            localStorage.setItem(COLLAPSED_KEY, isNowCollapsed);
+        });
+    </script>
 </body>
 </html>
