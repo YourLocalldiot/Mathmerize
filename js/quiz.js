@@ -139,16 +139,160 @@ function initQuiz(quizData) {
                   .toLowerCase();
     }
 
+    function latexToMathJS(str) {
+        if (!str) return '0';
+        let res = str;
+        res = res.replace(/\\left/g, '');
+        res = res.replace(/\\right/g, '');
+        res = res.replace(/\\cdot/g, '*');
+        res = res.replace(/\\times/g, '*');
+        
+        while(res.includes('\\frac')) {
+            let prev = res;
+            res = extractAndReplaceFrac(res);
+            if (res === prev) break;
+        }
+        
+        res = res.replace(/\\(sin|cos|tan|csc|sec|cot)\^(\d+)\(([^)]+)\)/g, '($1($3))^$2');
+        res = res.replace(/\\(sin|cos|tan|csc|sec|cot)\^(\d+)\{([^}]+)\}/g, '($1($3))^$2');
+        
+        res = res.replace(/\\(sin|cos|tan|csc|sec|cot)\(/g, '$1(');
+        res = res.replace(/\\ln\(/g, 'log(');
+        res = res.replace(/\\pi/g, 'pi');
+        
+        res = res.replace(/sin/g, 'F1');
+        res = res.replace(/cos/g, 'F2');
+        res = res.replace(/tan/g, 'F3');
+        res = res.replace(/csc/g, 'F4');
+        res = res.replace(/sec/g, 'F5');
+        res = res.replace(/cot/g, 'F6');
+        res = res.replace(/log/g, 'F7');
+        res = res.replace(/pi/g, 'F8');
+        
+        while(/(?:[a-zA-Z])(?:[a-zA-Z])/.test(res)) {
+            res = res.replace(/([a-zA-Z])([a-zA-Z])/g, '$1*$2');
+        }
+        
+        res = res.replace(/F\*1/g, 'sin');
+        res = res.replace(/F\*2/g, 'cos');
+        res = res.replace(/F\*3/g, 'tan');
+        res = res.replace(/F\*4/g, 'csc');
+        res = res.replace(/F\*5/g, 'sec');
+        res = res.replace(/F\*6/g, 'cot');
+        res = res.replace(/F\*7/g, 'log');
+        res = res.replace(/F\*8/g, 'pi');
+        
+        res = res.replace(/\\/g, '');
+
+        return res;
+    }
+
+    function extractAndReplaceFrac(str) {
+        let idx = str.indexOf('\\frac');
+        if (idx === -1) return str;
+        
+        function getGroup(start) {
+            let count = 0;
+            let i = start;
+            let val = "";
+            if (str[i] !== '{') return null;
+            for (; i < str.length; i++) {
+                if (str[i] === '{') count++;
+                else if (str[i] === '}') count--;
+                val += str[i];
+                if (count === 0) break;
+            }
+            return { val, end: i };
+        }
+        
+        let num = getGroup(idx + 5);
+        if (!num) return str.replace('\\frac', 'frac');
+        let den = getGroup(num.end + 1);
+        if (!den) return str.replace('\\frac', 'frac');
+        
+        let before = str.substring(0, idx);
+        let after = str.substring(den.end + 1);
+        
+        let nStr = num.val.substring(1, num.val.length - 1);
+        let dStr = den.val.substring(1, den.val.length - 1);
+        
+        return before + '(' + nStr + ')/(' + dStr + ')' + after;
+    }
+
+    function areEquivalent(latex1, latex2) {
+        let expr1 = latexToMathJS(latex1);
+        let expr2 = latexToMathJS(latex2);
+        try {
+            for(let i=0; i<3; i++) {
+                let scope = {
+                    x: Math.random() * 2 + 1, z: Math.random() * 2 + 1,
+                    A: Math.random() * 2 + 1, B: Math.random() * 2 + 1, C: Math.random() * 2 + 1,
+                    a: Math.random() * 2 + 1, b: Math.random() * 2 + 1, c: Math.random() * 2 + 1
+                };
+                let val1 = math.evaluate(expr1, scope);
+                let val2 = math.evaluate(expr2, scope);
+                if (Math.abs(val1 - val2) > 1e-6) return false;
+            }
+            return true;
+        } catch(e) { return false; }
+    }
+
     function checkAnswer() {
-        let userInput = normalizeLatex(mathField.latex());
-        let expected = normalizeLatex(quizData[currentIndex].answer);
+        let userInput = mathField.latex();
+        let expected = quizData[currentIndex].answer;
+        
+        let userParts = userInput.split('=');
         let expectedParts = expected.split('=');
         let isCorrect = false;
 
-        if (expectedParts.length > 1) {
-            isCorrect = expectedParts.every(p => userInput.includes(p)) || userInput === expected;
-        } else {
-            isCorrect = userInput === expected;
+        if (expectedParts.length === 1) {
+            if (userParts.length === 1) {
+                isCorrect = areEquivalent(userParts[0], expectedParts[0]);
+            }
+        } else if (expectedParts.length === 2) {
+            let isIdentity = areEquivalent(expectedParts[0], expectedParts[1]);
+            if (isIdentity) {
+                isCorrect = userParts.every(up => areEquivalent(up, expectedParts[0])) && userParts.length >= 1;
+            } else {
+                if (userParts.length === 2) {
+                    let L1 = expectedParts[0], R1 = expectedParts[1];
+                    let L2 = userParts[0], R2 = userParts[1];
+                    let exprExpected = `(${latexToMathJS(L1)})-(${latexToMathJS(R1)})`;
+                    let exprUser = `(${latexToMathJS(L2)})-(${latexToMathJS(R2)})`;
+                    let eqMatch = true;
+                    try {
+                        for(let i=0; i<3; i++) {
+                            let scope = {
+                                x: Math.random() * 2 + 1, z: Math.random() * 2 + 1,
+                                A: Math.random() * 2 + 1, B: Math.random() * 2 + 1, C: Math.random() * 2 + 1,
+                                a: Math.random() * 2 + 1, b: Math.random() * 2 + 1, c: Math.random() * 2 + 1
+                            };
+                            let valE = math.evaluate(exprExpected, scope);
+                            let valU = math.evaluate(exprUser, scope);
+                            if (Math.abs(valE - valU) > 1e-6 && Math.abs(valE + valU) > 1e-6) {
+                                eqMatch = false; break;
+                            }
+                        }
+                        isCorrect = eqMatch;
+                    } catch(e) { isCorrect = false; }
+                }
+            }
+        } else if (expectedParts.length > 2) {
+            let isIdentity = areEquivalent(expectedParts[0], expectedParts[1]);
+            if (isIdentity) {
+                let allEquiv = userParts.every(up => areEquivalent(up, expectedParts[0]));
+                isCorrect = allEquiv && userParts.length >= expectedParts.length;
+            }
+        }
+
+        if (!isCorrect) {
+            let uStr = normalizeLatex(userInput);
+            let eStr = normalizeLatex(expected);
+            if (expectedParts.length > 1) {
+                isCorrect = expectedParts.every(p => uStr.includes(normalizeLatex(p))) || uStr === eStr;
+            } else {
+                isCorrect = uStr === eStr;
+            }
         }
 
         if (isCorrect) {
@@ -250,10 +394,17 @@ onAuthStateChanged(auth, async (user) => {
                 const data = quizDoc.data();
                 // Update page title with quiz name
                 document.title = `${data.title} — Mathmerize`;
-                // Update disclaimer with quiz code
+                const titleDisplay = document.getElementById('quiz-title-display');
+                if (titleDisplay) titleDisplay.textContent = data.title;
+
+                // Update quiz code
                 if (data.code) {
-                    document.getElementById('quiz-disclaimer').textContent =
-                        `Quiz code: ${data.code}  ·  Share this with others to let them play the same set!`;
+                    const codeDisplay = document.getElementById('quiz-code-display');
+                    const codeBox = document.getElementById('quiz-code-box-display');
+                    if (codeDisplay && codeBox) {
+                        codeDisplay.textContent = data.code;
+                        codeBox.classList.remove('hidden');
+                    }
                 }
                 // Wait for jQuery/MathQuill to be ready
                 $(document).ready(() => initQuiz([...data.questions]));

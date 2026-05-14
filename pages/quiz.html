@@ -14,6 +14,8 @@
     <!-- KaTeX for rendering static questions -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css">
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script>
+    <!-- Math.js for numerical evaluation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.js"></script>
 
     <link rel="stylesheet" href="../css/quiz.css">
 
@@ -202,12 +204,9 @@
 
         <!-- Quiz wrapper (hidden until data is ready) -->
         <div id="quiz-wrapper" style="width:100%;max-width:576px;display:none;">
-            <!-- Disclaimer -->
-            <div class="w-full mb-4 py-2 px-4 bg-slate-200/50 rounded-lg border border-slate-300 text-center">
-                <p class="text-[10px] sm:text-xs text-slate-600 font-medium italic" id="quiz-disclaimer">
-                    If you know an answer is wrong, that means you are smarter than the guy who made this quiz. Kudos!
-                </p>
-            </div>
+            <!-- Quiz Title -->
+            <h1 id="quiz-title-display" class="text-3xl sm:text-4xl font-bold text-slate-800 text-center mb-6"></h1>
+
 
             <div class="w-full bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
                 <div class="h-1.5 bg-slate-100 w-full">
@@ -219,14 +218,22 @@
                         <span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest">
                             Question <span id="q-number">1</span> / <span id="total-q"></span>
                         </span>
-                        <span class="text-[10px] sm:text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">
-                            Score: <span id="score">0</span>
-                        </span>
+                        <div class="flex items-center gap-2">
+                            <span id="quiz-code-box" class="text-[10px] sm:text-xs font-bold text-red-700 hover:text-red-800 cursor-pointer hidden transition-colors mr-2">
+                                Report a Problem
+                            </span>
+                            <span id="quiz-code-box-display" class="text-[10px] sm:text-xs font-bold text-slate-600 bg-slate-100 px-3 py-1 rounded-full hidden">
+                                Code: <span id="quiz-code-display"></span>
+                            </span>
+                            <span class="text-[10px] sm:text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">
+                                Score: <span id="score">0</span>
+                            </span>
+                        </div>
                     </div>
 
-                    <div class="text-center mb-4 sm:mb-6 min-h-[90px] flex flex-col justify-center bg-slate-50 rounded-xl border border-slate-100 p-3">
-                        <h2 id="question-prompt" class="text-[11px] sm:text-[13px] font-bold text-slate-700 mb-1 uppercase tracking-wider"></h2>
-                        <div id="question-display" class="text-xl sm:text-2xl font-bold text-slate-800"></div>
+                    <div class="text-center mb-4 sm:mb-6 min-h-[140px] flex flex-col justify-center bg-slate-50 rounded-xl border border-slate-100 p-6">
+                        <h2 id="question-prompt" class="text-sm sm:text-base font-medium text-slate-700 mb-2"></h2>
+                        <div id="question-display" class="text-xl sm:text-3xl font-bold text-slate-800"></div>
                     </div>
 
                     <div id="math-field"></div>
