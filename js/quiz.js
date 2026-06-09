@@ -88,7 +88,7 @@ function renderAuthSection(user) {
 /* -------------------------------------------------------
    QUIZ LOGIC (jQuery-based, unchanged from original)
    ------------------------------------------------------- */
-function initQuiz(quizData) {
+function initQuiz(quizData, isRandomize) {
     // Show quiz wrapper, hide loading
     document.getElementById('quiz-loading').style.display = 'none';
     document.getElementById('quiz-wrapper').style.display = 'block';
@@ -103,7 +103,9 @@ function initQuiz(quizData) {
         return array;
     }
 
-    shuffle(quizData);
+    if (isRandomize) {
+        shuffle(quizData);
+    }
 
     const MQ = MathQuill.getInterface(2);
     let score = 0;
@@ -407,7 +409,7 @@ onAuthStateChanged(auth, async (user) => {
                     }
                 }
                 // Wait for jQuery/MathQuill to be ready
-                $(document).ready(() => initQuiz([...data.questions]));
+                $(document).ready(() => initQuiz([...data.questions], data.randomize));
             } else {
                 showError('Quiz not found. It may have been deleted.');
             }
@@ -417,7 +419,7 @@ onAuthStateChanged(auth, async (user) => {
         }
     } else {
         // Fallback: use built-in question bank
-        $(document).ready(() => initQuiz([...FALLBACK_QUIZ]));
+        $(document).ready(() => initQuiz([...FALLBACK_QUIZ], true));
     }
 });
 

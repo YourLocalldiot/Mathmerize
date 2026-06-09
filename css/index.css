@@ -1,6 +1,26 @@
 body {
     font-family: 'Inter', sans-serif;
     background-color: #f8fafc;
+.sidebar-logo-image {
+    width: 140px;
+    height: 32px;
+    transition: width 0.25s cubic-bezier(.4,0,.2,1);
+}
+.mask-logo {
+    background: linear-gradient(135deg, #6366f1, #9333ea);
+    -webkit-mask-image: url('../images/Mathmerize black.png');
+    -webkit-mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: left;
+    mask-image: url('../images/Mathmerize black.png');
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: left;
+}
+#main-sidebar.collapsed .sidebar-logo-image {
+    width: 28px;
+    -webkit-mask-size: cover;
+    mask-size: cover;
 }
 
 .mesh-bg {

@@ -49,22 +49,34 @@
         .sidebar-logo {
             font-size: 1.25rem;
             font-weight: 700;
-            background: linear-gradient(135deg, #6366f1, #9333ea);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
             display: flex;
             align-items: center;
             gap: 8px;
             white-space: nowrap;
             overflow: hidden;
         }
-        /* The icon inside .sidebar-logo must escape the gradient clip */
-        .sidebar-logo .logo-icon {
-            color: #6366f1;
-            -webkit-text-fill-color: initial;
-            flex-shrink: 0;
+        
+        .sidebar-logo-image {
+            width: 140px;
+            height: 32px;
+            transition: width 0.25s cubic-bezier(.4,0,.2,1);
         }
-        .sidebar-logo-text { transition: opacity 0.2s; overflow: hidden; }
+        .mask-logo {
+            background: linear-gradient(135deg, #6366f1, #9333ea);
+            -webkit-mask-image: url('../images/Mathmerize black.png');
+            -webkit-mask-size: contain;
+            -webkit-mask-repeat: no-repeat;
+            -webkit-mask-position: left;
+            mask-image: url('../images/Mathmerize black.png');
+            mask-size: contain;
+            mask-repeat: no-repeat;
+            mask-position: left;
+        }
+        .sidebar.collapsed .sidebar-logo-image {
+            width: 28px;
+            -webkit-mask-size: cover;
+            mask-size: cover;
+        }
         .sidebar.collapsed .sidebar-logo-text { opacity: 0; width: 0; }
 
         /* Toggle button — sibling of .sidebar-logo, not inside it */
@@ -151,11 +163,7 @@
         <!-- Header: logo left, toggle right -->
         <div class="sidebar-header">
             <div class="sidebar-logo">
-                <svg class="logo-icon" width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-                </svg>
-                <span class="sidebar-logo-text">Mathmerize</span>
+                <div class="sidebar-logo-image mask-logo" title="Mathmerize"></div>
             </div>
             <button class="sidebar-toggle" id="sidebar-toggle" title="Toggle sidebar">
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -232,8 +240,8 @@
                     </div>
 
                     <div class="text-center mb-4 sm:mb-6 min-h-[140px] flex flex-col justify-center bg-slate-50 rounded-xl border border-slate-100 p-6">
-                        <h2 id="question-prompt" class="text-sm sm:text-base font-medium text-slate-700 mb-2"></h2>
-                        <div id="question-display" class="text-xl sm:text-3xl font-bold text-slate-800"></div>
+                        <h2 id="question-prompt" class="text-sm sm:text-base font-medium text-slate-700 mb-2 latex-font"></h2>
+                        <div id="question-display" class="text-xl sm:text-3xl font-bold text-slate-800 latex-font"></div>
                     </div>
 
                     <div id="math-field"></div>

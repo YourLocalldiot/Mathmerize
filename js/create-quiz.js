@@ -9,6 +9,7 @@ let quizData = {
     questions: []
 };
 let quizId = null;
+let hasUnsavedChanges = false;
 
 const DEFAULT_QUESTIONS = [
     { prompt: "Evaluate the equation", text: "1+2x3", answer: "7" }
@@ -21,7 +22,66 @@ const questionCountDisplay = document.getElementById('question-count-display');
 const saveBtn = document.getElementById('save-btn');
 const saveBtnText = document.getElementById('save-btn-text');
 const saveSpinner = document.getElementById('save-spinner');
+const randomizeSwitch = document.getElementById('randomize-switch');
 const toast = document.getElementById('toast');
+
+// Edit Question View Elements
+const mainContentContainer = document.querySelector('.content-container:not(#edit-question-view)');
+const editQuestionView = document.getElementById('edit-question-view');
+const editQHeader = document.getElementById('edit-q-header');
+const editQPrompt = document.getElementById('edit-q-prompt');
+const editQPromptPlaceholder = document.getElementById('edit-q-prompt-placeholder');
+const editQEquation = document.getElementById('edit-q-equation');
+const editQEquationPlaceholder = document.getElementById('edit-q-equation-placeholder');
+const cancelEditBtn = document.getElementById('cancel-edit-btn');
+const saveQDetailBtn = document.getElementById('save-q-detail-btn');
+const editMathFieldEl = document.getElementById('edit-math-field');
+const editMathPlaceholder = document.getElementById('edit-math-placeholder');
+
+const MQ = MathQuill.getInterface(2);
+let editEquationField, editMathField;
+let activeMathField = null;
+let editingQuestionIndex = -1; // -1 means new question
+
+// Drag and drop state
+let dragStartIndex = null;
+
+function handleDragStart(e) {
+    dragStartIndex = parseInt(e.currentTarget.dataset.index);
+    e.dataTransfer.effectAllowed = 'move';
+    e.currentTarget.style.opacity = '0.5';
+}
+function handleDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    return false;
+}
+function handleDragEnter(e) {
+    const card = e.currentTarget.closest('.question-card');
+    if (card) card.style.borderTop = '2px solid #6366f1';
+}
+function handleDragLeave(e) {
+    const card = e.currentTarget.closest('.question-card');
+    if (card) card.style.borderTop = '';
+}
+function handleDragEnd(e) {
+    e.currentTarget.style.opacity = '1';
+    document.querySelectorAll('.question-card').forEach(c => c.style.borderTop = '');
+}
+function handleDrop(e) {
+    e.stopPropagation();
+    const card = e.currentTarget.closest('.question-card');
+    if (card) card.style.borderTop = '';
+    const dragEndIndex = parseInt(card.dataset.index);
+    
+    if (dragStartIndex !== dragEndIndex && dragStartIndex !== null && !isNaN(dragEndIndex)) {
+        const item = quizData.questions.splice(dragStartIndex, 1)[0];
+        quizData.questions.splice(dragEndIndex, 0, item);
+        hasUnsavedChanges = true;
+        renderQuestions();
+    }
+    return false;
+}
 
 // Utilities
 function showToast(msg) {
@@ -76,7 +136,8 @@ function renderAuthSection(user) {
 
 // Render Questions
 function renderQuestions() {
-    titleInput.value = quizData.title;
+    titleInput.value = quizData.title || "Untitled Quiz";
+    randomizeSwitch.checked = !!quizData.randomize;
     questionCountDisplay.textContent = `${quizData.questions.length} Question${quizData.questions.length !== 1 ? 's' : ''}`;
     
     questionsList.innerHTML = '';
@@ -84,9 +145,10 @@ function renderQuestions() {
     quizData.questions.forEach((q, index) => {
         const qNumStr = String(index + 1).padStart(2, '0');
         const card = document.createElement('div');
-        card.className = 'question-card';
+        card.className = 'question-card transition-all duration-200';
+        card.dataset.index = index;
         card.innerHTML = `
-            <div class="drag-handle">
+            <div class="drag-handle" title="Drag to reorder">
                 <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24">
                     <circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/>
                     <circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/>
@@ -96,7 +158,7 @@ function renderQuestions() {
             <div class="question-header">
                 <div class="q-number-prompt">
                     <span class="q-number">${qNumStr}</span>
-                    <span class="q-prompt">${q.prompt}</span>
+                    <span class="q-prompt">${q.prompt ? q.prompt.replace(/\\ /g, ' ') : ''}</span>
                 </div>
                 <div class="q-actions">
                     <button class="icon-btn duplicate-btn" data-index="${index}" title="Duplicate">
@@ -105,7 +167,7 @@ function renderQuestions() {
                     <button class="icon-btn delete-btn" data-index="${index}" title="Delete">
                         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                     </button>
-                    <button class="icon-btn" title="Edit">
+                    <button class="icon-btn edit-btn" data-index="${index}" title="Edit">
                         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                         <span>Edit</span>
                     </button>
@@ -134,6 +196,19 @@ function renderQuestions() {
         } catch (e) {
             document.getElementById(`ans-disp-${index}`).textContent = q.answer;
         }
+
+        // Setup drag and drop
+        const handle = card.querySelector('.drag-handle');
+        handle.addEventListener('mousedown', () => { card.draggable = true; });
+        handle.addEventListener('mouseup', () => { card.draggable = false; });
+        handle.addEventListener('mouseleave', () => { card.draggable = false; });
+        
+        card.addEventListener('dragstart', handleDragStart);
+        card.addEventListener('dragover', handleDragOver);
+        card.addEventListener('dragenter', handleDragEnter);
+        card.addEventListener('dragleave', handleDragLeave);
+        card.addEventListener('drop', handleDrop);
+        card.addEventListener('dragend', handleDragEnd);
     });
 
     // Attach event listeners for actions
@@ -150,6 +225,13 @@ function renderQuestions() {
             deleteQuestion(index);
         });
     });
+
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const index = parseInt(e.currentTarget.dataset.index);
+            openEditView(index);
+        });
+    });
 }
 
 // Logic functions
@@ -157,13 +239,55 @@ function duplicateQuestion(index) {
     const q = Object.assign({}, quizData.questions[index]);
     // Insert after current
     quizData.questions.splice(index + 1, 0, q);
+    hasUnsavedChanges = true;
     renderQuestions();
 }
 
 function deleteQuestion(index) {
     if (confirm("Are you sure you want to delete this question?")) {
         quizData.questions.splice(index, 1);
+        hasUnsavedChanges = true;
         renderQuestions();
+    }
+}
+
+function openEditView(index = -1) {
+    editingQuestionIndex = index;
+    mainContentContainer.classList.add('hidden');
+    editQuestionView.classList.remove('hidden');
+
+    if (index === -1) {
+        editQHeader.textContent = `QUESTION ${quizData.questions.length + 1} / NEW`;
+        editQPrompt.value = '';
+        editEquationField.latex('');
+        editMathField.latex('');
+    } else {
+        const q = quizData.questions[index];
+        editQHeader.textContent = `QUESTION ${index + 1} / ${quizData.questions.length}`;
+        editQPrompt.value = q.prompt ? q.prompt.replace(/\\ /g, ' ') : '';
+        editEquationField.latex(q.text || '');
+        editMathField.latex(q.answer || '');
+    }
+    updateAllPlaceholders();
+    activeMathField = editQPrompt;
+    setTimeout(() => activeMathField.focus(), 100);
+}
+
+function closeEditView() {
+    mainContentContainer.classList.remove('hidden');
+    editQuestionView.classList.add('hidden');
+}
+
+function updateAllPlaceholders() {
+    updatePlaceholder(editEquationField, editQEquationPlaceholder);
+    updatePlaceholder(editMathField, editMathPlaceholder);
+}
+
+function updatePlaceholder(field, placeholderEl) {
+    if (field && field.latex().trim() !== '') {
+        placeholderEl.classList.add('hidden');
+    } else {
+        placeholderEl.classList.remove('hidden');
     }
 }
 
@@ -188,7 +312,8 @@ async function saveQuiz() {
         
         await updateDoc(quizzesRef, {
             title: quizData.title,
-            questions: quizData.questions
+            questions: quizData.questions,
+            randomize: !!quizData.randomize
         }).catch(async (error) => {
             // If it doesn't exist, create it (should rarely happen if we initialize properly)
             if (error.code === 'not-found') {
@@ -199,6 +324,7 @@ async function saveQuiz() {
                 await setDoc(quizzesRef, {
                     title: quizData.title,
                     questions: quizData.questions,
+                    randomize: !!quizData.randomize,
                     code: code,
                     createdAt: serverTimestamp()
                 });
@@ -208,6 +334,7 @@ async function saveQuiz() {
         });
 
         showToast("Quiz saved successfully!");
+        hasUnsavedChanges = false;
     } catch (err) {
         console.error("Error saving quiz: ", err);
         showToast("Failed to save quiz.");
@@ -255,6 +382,7 @@ onAuthStateChanged(auth, async (user) => {
                 await setDoc(doc(db, 'users', user.uid, 'quizzes', quizId), {
                     title: quizData.title,
                     questions: quizData.questions,
+                    randomize: !!quizData.randomize,
                     code: code,
                     createdAt: serverTimestamp()
                 });
@@ -276,18 +404,137 @@ onAuthStateChanged(auth, async (user) => {
 // Event Listeners
 saveBtn.addEventListener('click', saveQuiz);
 
-document.getElementById('preview-btn').addEventListener('click', () => {
-    showToast("Preview page will be created later.");
-});
 
 document.getElementById('create-q-btn').addEventListener('click', () => {
-    showToast("Create question page will be created later.");
+    openEditView(-1);
 });
 
 document.getElementById('add-q-btn').addEventListener('click', () => {
-    showToast("Add question page will be created later.");
+    openEditView(-1);
+});
+
+cancelEditBtn.addEventListener('click', closeEditView);
+
+saveQDetailBtn.addEventListener('click', () => {
+    const promptText = editQPrompt.value.trim();
+    const equationText = editEquationField.latex().trim();
+    const answerLatex = editMathField.latex().trim();
+
+    if (!promptText && !equationText && !answerLatex) {
+        showToast("Please enter question details.");
+        return;
+    }
+
+    const newQ = {
+        prompt: promptText,
+        text: equationText,
+        answer: answerLatex
+    };
+
+    if (editingQuestionIndex === -1) {
+        quizData.questions.push(newQ);
+    } else {
+        quizData.questions[editingQuestionIndex] = newQ;
+    }
+
+    hasUnsavedChanges = true;
+    renderQuestions();
+    closeEditView();
+});
+
+// Initialize Edit View functionality
+$(document).ready(() => {
+    const defaultOptions = {
+        handlers: {
+            edit: function() {
+                updateAllPlaceholders();
+            }
+        },
+        autoCommands: 'pi theta sqrt sum',
+        autoParenthesizedFunctions: 'sin cos tan csc sec cot ln'
+    };
+
+    editEquationField = MQ.MathField(editQEquation, defaultOptions);
+    editMathField = MQ.MathField(editMathFieldEl, defaultOptions);
+
+    activeMathField = editMathField;
+
+    $(editQPrompt).on('focus', () => activeMathField = editQPrompt);
+    $(editQEquation).on('focusin', () => activeMathField = editEquationField);
+    $(editMathFieldEl).on('focusin', () => activeMathField = editMathField);
+
+    $('#edit-question-view .keypad-btn').on('click touchstart', function(e) {
+        e.preventDefault();
+        const cmd = $(this).attr('data-cmd');
+        if (!cmd || !activeMathField) return;
+        activeMathField.focus();
+        
+        if (activeMathField === editQPrompt) {
+            const start = activeMathField.selectionStart;
+            const end = activeMathField.selectionEnd;
+            const val = activeMathField.value;
+            
+            let insertText = cmd;
+            if (cmd === '\\frac') insertText = '\\frac{}{}';
+            else if (cmd === '\\sqrt') insertText = '\\sqrt{}';
+            else if (['\\sin','\\cos','\\tan','\\csc','\\sec','\\cot','\\ln'].includes(cmd)) insertText = cmd + '()';
+            
+            activeMathField.value = val.substring(0, start) + insertText + val.substring(end);
+            
+            let newCursorPos = start + insertText.length;
+            if (insertText.endsWith('{}')) newCursorPos -= 1;
+            else if (insertText.endsWith('()')) newCursorPos -= 1;
+            
+            activeMathField.setSelectionRange(newCursorPos, newCursorPos);
+        } else {
+            if (cmd === '^2') { activeMathField.write('^2'); }
+            else if (cmd === '^') { activeMathField.write('^'); }
+            else if (cmd === '\\frac') { activeMathField.write('\\frac{ }{ }'); activeMathField.keystroke('Left'); activeMathField.keystroke('Left'); }
+            else if (cmd === '\\sqrt') { activeMathField.write('\\sqrt{ }'); activeMathField.keystroke('Left'); }
+            else if (['\\sin','\\cos','\\tan','\\csc','\\sec','\\cot','\\ln'].includes(cmd)) { activeMathField.write(cmd + '\\left(\\right)'); activeMathField.keystroke('Left'); }
+            else if (cmd.includes('lim')) { activeMathField.write(cmd); activeMathField.keystroke('Left'); }
+            else { activeMathField.write(cmd); }
+            updateAllPlaceholders();
+        }
+    });
+
+    $('#edit-backspace-btn').on('click touchstart', function(e) {
+        e.preventDefault();
+        if(!activeMathField) return;
+        activeMathField.focus();
+        
+        if (activeMathField === editQPrompt) {
+            const start = activeMathField.selectionStart;
+            const end = activeMathField.selectionEnd;
+            const val = activeMathField.value;
+            
+            if (start === end && start > 0) {
+                activeMathField.value = val.substring(0, start - 1) + val.substring(end);
+                activeMathField.setSelectionRange(start - 1, start - 1);
+            } else if (start !== end) {
+                activeMathField.value = val.substring(0, start) + val.substring(end);
+                activeMathField.setSelectionRange(start, start);
+            }
+        } else {
+            activeMathField.keystroke('Backspace');
+            updateAllPlaceholders();
+        }
+    });
 });
 
 titleInput.addEventListener('change', () => {
     quizData.title = titleInput.value.trim() || "Untitled Quiz";
+    hasUnsavedChanges = true;
+});
+
+randomizeSwitch.addEventListener('change', () => {
+    quizData.randomize = randomizeSwitch.checked;
+    hasUnsavedChanges = true;
+});
+
+window.addEventListener('beforeunload', (e) => {
+    if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+    }
 });
