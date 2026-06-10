@@ -463,41 +463,107 @@ $(document).ready(() => {
     $(editQEquation).on('focusin', () => activeMathField = editEquationField);
     $(editMathFieldEl).on('focusin', () => activeMathField = editMathField);
 
-    $('#edit-question-view .keypad-btn').on('click touchstart', function(e) {
-        e.preventDefault();
-        const cmd = $(this).attr('data-cmd');
-        if (!cmd || !activeMathField) return;
-        activeMathField.focus();
-        
-        if (activeMathField === editQPrompt) {
-            const start = activeMathField.selectionStart;
-            const end = activeMathField.selectionEnd;
-            const val = activeMathField.value;
-            
-            let insertText = cmd;
+    // ---- Keyboard helper ----
+    function execMkCmd(cmd, field) {
+        if (!field) return;
+
+        if (field === editQPrompt) {
+            // Plain text field
+            const start = field.selectionStart;
+            const end = field.selectionEnd;
+            const val = field.value;
+            let insertText = cmd.replace(/\\/g, '\\');
             if (cmd === '\\frac') insertText = '\\frac{}{}';
             else if (cmd === '\\sqrt') insertText = '\\sqrt{}';
-            else if (['\\sin','\\cos','\\tan','\\csc','\\sec','\\cot','\\ln'].includes(cmd)) insertText = cmd + '()';
-            
-            activeMathField.value = val.substring(0, start) + insertText + val.substring(end);
-            
-            let newCursorPos = start + insertText.length;
-            if (insertText.endsWith('{}')) newCursorPos -= 1;
-            else if (insertText.endsWith('()')) newCursorPos -= 1;
-            
-            activeMathField.setSelectionRange(newCursorPos, newCursorPos);
-        } else {
-            if (cmd === '^2') { activeMathField.write('^2'); }
-            else if (cmd === '^') { activeMathField.write('^'); }
-            else if (cmd === '\\frac') { activeMathField.write('\\frac{ }{ }'); activeMathField.keystroke('Left'); activeMathField.keystroke('Left'); }
-            else if (cmd === '\\sqrt') { activeMathField.write('\\sqrt{ }'); activeMathField.keystroke('Left'); }
-            else if (['\\sin','\\cos','\\tan','\\csc','\\sec','\\cot','\\ln'].includes(cmd)) { activeMathField.write(cmd + '\\left(\\right)'); activeMathField.keystroke('Left'); }
-            else if (cmd.includes('lim')) { activeMathField.write(cmd); activeMathField.keystroke('Left'); }
-            else { activeMathField.write(cmd); }
-            updateAllPlaceholders();
+            else if ([
+                '\\sin','\\cos','\\tan','\\csc','\\sec','\\cot','\\ln',
+                '\\arcsin','\\arccos','\\arctan','\\exp','\\log',
+                '\\sinh','\\cosh','\\tanh','\\coth',
+                '\\operatorname{arccsc}','\\operatorname{arcsec}','\\operatorname{arccot}',
+                '\\operatorname{csch}','\\operatorname{sech}',
+                '\\operatorname{lcm}','\\gcd','\\operatorname{mod}',
+                '\\operatorname{round}','\\operatorname{sign}',
+                '\\operatorname{nPr}','\\operatorname{nCr}'
+            ].includes(cmd)) insertText = cmd + '()';
+            field.value = val.substring(0, start) + insertText + val.substring(end);
+            let pos = start + insertText.length;
+            if (insertText.endsWith('{}')) pos -= 1;
+            else if (insertText.endsWith('()')) pos -= 1;
+            field.setSelectionRange(pos, pos);
+            return;
         }
+
+        // MathQuill field
+        field.focus();
+        if (cmd === '^2') { field.write('^2'); }
+        else if (cmd === '^') { field.write('^'); }
+        else if (cmd === '\\frac') { field.write('\\frac{ }{ }'); field.keystroke('Left'); field.keystroke('Left'); }
+        else if (cmd === '\\sqrt') { field.write('\\sqrt{ }'); field.keystroke('Left'); }
+        else if ([
+            '\\sin','\\cos','\\tan','\\csc','\\sec','\\cot','\\ln',
+            '\\arcsin','\\arccos','\\arctan','\\exp','\\log',
+            '\\sinh','\\cosh','\\tanh','\\coth',
+            '\\operatorname{arccsc}','\\operatorname{arcsec}','\\operatorname{arccot}',
+            '\\operatorname{csch}','\\operatorname{sech}',
+            '\\operatorname{lcm}','\\gcd','\\operatorname{mod}',
+            '\\operatorname{round}','\\operatorname{sign}',
+            '\\operatorname{nPr}','\\operatorname{nCr}'
+        ].includes(cmd)) {
+            field.write(cmd + '\\left(\\right)'); field.keystroke('Left');
+        }
+        else if (cmd === '\\lceil') { field.write('\\lceil\\rceil'); field.keystroke('Left'); }
+        else if (cmd === '\\lfloor') { field.write('\\lfloor\\rfloor'); field.keystroke('Left'); }
+        else if (cmd === '\\log_{}') { field.write('\\log_{ }\\left(\\right)'); field.keystroke('Left'); }
+        else if (cmd === '\\frac{d}{dx}') { field.write('\\frac{d}{dx}\\left(\\right)'); field.keystroke('Left'); }
+        else if (cmd === '\\sqrt[]{}') { field.write('\\sqrt[]{ }'); field.keystroke('Left'); }
+        else if (cmd.includes('lim') || cmd.includes('sum') || cmd.includes('int') || cmd.includes('prod')) {
+            field.write(cmd); field.keystroke('Left');
+        }
+        else { field.write(cmd); }
+        updateAllPlaceholders();
+    }
+
+    // Wire new mk-btn buttons
+    document.querySelectorAll('#edit-mk-wrapper [data-mk-cmd]').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (!activeMathField) return;
+            execMkCmd(this.getAttribute('data-mk-cmd'), activeMathField);
+        });
+        btn.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            if (!activeMathField) return;
+            execMkCmd(this.getAttribute('data-mk-cmd'), activeMathField);
+        }, { passive: false });
     });
 
+    // Functions panel toggle
+    const editFnToggle = document.getElementById('edit-fn-toggle');
+    const editFnPanel = document.getElementById('edit-fn-panel');
+    if (editFnToggle && editFnPanel) {
+        editFnToggle.addEventListener('click', () => {
+            const isOpen = editFnPanel.classList.toggle('open');
+            editFnToggle.classList.toggle('active', isOpen);
+        });
+        document.addEventListener('click', (e) => {
+            if (!editFnToggle.contains(e.target) && !editFnPanel.contains(e.target)) {
+                editFnPanel.classList.remove('open');
+                editFnToggle.classList.remove('active');
+            }
+        });
+    }
+
+    // Left / Right navigation
+    const editLeftBtn = document.getElementById('edit-left-btn');
+    const editRightBtn = document.getElementById('edit-right-btn');
+    if (editLeftBtn) editLeftBtn.addEventListener('click', () => {
+        if (activeMathField && activeMathField !== editQPrompt) { activeMathField.focus(); activeMathField.keystroke('Left'); }
+    });
+    if (editRightBtn) editRightBtn.addEventListener('click', () => {
+        if (activeMathField && activeMathField !== editQPrompt) { activeMathField.focus(); activeMathField.keystroke('Right'); }
+    });
+
+    // Backspace
     $('#edit-backspace-btn').on('click touchstart', function(e) {
         e.preventDefault();
         if(!activeMathField) return;

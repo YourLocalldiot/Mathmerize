@@ -1,0 +1,255 @@
+/* ============================================================
+   Mathmerize Math Keyboard — Desmos-inspired
+   ============================================================ */
+
+/* ---- Keyboard Wrapper ---- */
+.mk-wrapper {
+    position: relative;
+    width: 100%;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    font-family: 'Inter', sans-serif;
+}
+
+/* ---- Functions Panel (slides up above keyboard) ---- */
+.mk-fn-panel {
+    display: none;
+    position: absolute;
+    bottom: 100%;
+    right: 0;
+    width: 320px;
+    max-height: 360px;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 12px 12px 0 0;
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.12);
+    overflow-y: auto;
+    z-index: 50;
+    padding: 12px;
+}
+.mk-fn-panel.open {
+    display: block;
+}
+/* Scrollbar styling */
+.mk-fn-panel::-webkit-scrollbar { width: 6px; }
+.mk-fn-panel::-webkit-scrollbar-track { background: transparent; }
+.mk-fn-panel::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+
+/* Up/down arrow scroll indicators */
+.mk-fn-panel-arrows {
+    position: absolute;
+    right: 4px;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 6px 0;
+    pointer-events: none;
+    z-index: 51;
+}
+.mk-fn-panel-arrow {
+    width: 16px;
+    height: 16px;
+    color: #94a3b8;
+    pointer-events: all;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mk-fn-section {
+    margin-bottom: 16px;
+}
+.mk-fn-section:last-child {
+    margin-bottom: 0;
+}
+.mk-fn-section-title {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #94a3b8;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+}
+.mk-fn-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+}
+.mk-fn-btn {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    height: 38px;
+    font-size: 0.82rem;
+    font-family: 'KaTeX_Main', 'Times New Roman', serif;
+    color: #1e293b;
+    cursor: pointer;
+    transition: background 0.12s, border-color 0.12s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+}
+.mk-fn-btn:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+.mk-fn-btn:active {
+    background: #e2e8f0;
+    transform: scale(0.96);
+}
+/* superscript in fn buttons */
+.mk-fn-btn sup {
+    font-size: 0.55rem;
+    line-height: 1;
+}
+
+/* ---- Main Keyboard Grid ---- */
+.mk-main-keyboard {
+    display: grid;
+    /* 4 symbol cols | gap | 4 numpad cols | gap | 2 action cols */
+    grid-template-columns: repeat(4, 1fr) 6px repeat(4, 1fr) 6px repeat(2, 1fr);
+    grid-template-rows: repeat(4, 44px);
+    gap: 4px;
+    background: #d1d8e0;
+    padding: 8px;
+    border-radius: 0 0 12px 12px;
+    align-items: stretch;
+}
+.mk-main-keyboard.hidden {
+    display: none;
+}
+
+/* Spacer columns (the 6px gaps) */
+.mk-col-spacer {
+    background: transparent;
+    pointer-events: none;
+}
+
+/* ---- ABC Letter Keyboard Grid ---- */
+.mk-abc-keyboard {
+    display: none;
+    grid-template-columns: repeat(20, 1fr);
+    grid-template-rows: repeat(4, 44px);
+    gap: 4px;
+    background: #d1d8e0;
+    padding: 8px;
+    border-radius: 0 0 12px 12px;
+    align-items: stretch;
+}
+.mk-abc-keyboard.active {
+    display: grid;
+}
+
+.mk-abc-keyboard.shifted .mk-btn.letter {
+    text-transform: uppercase;
+}
+
+/* ---- Base Button ---- */
+.mk-btn {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: 'KaTeX_Main', 'Times New Roman', serif;
+    color: #1e293b;
+    cursor: pointer;
+    transition: background 0.1s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 0 #c5cdd9;
+    min-width: 0;
+    padding: 0 2px;
+}
+.mk-btn:hover { background: #f1f5f9; }
+.mk-btn:active { background: #e2e8f0; transform: translateY(1px); box-shadow: none; }
+
+/* Darker numpad buttons */
+.mk-btn.num {
+    background: #e9eef4;
+    border-color: #c9d3de;
+    box-shadow: 0 2px 0 #b0bccc;
+}
+.mk-btn.num:hover { background: #dde4ed; }
+.mk-btn.num:active { background: #cdd6e3; transform: translateY(1px); box-shadow: none; }
+
+/* Action (backspace, etc.) */
+.mk-btn.action {
+    background: #e2e8f0;
+    border-color: #c5cdd9;
+    box-shadow: 0 2px 0 #b0bccc;
+    color: #475569;
+}
+.mk-btn.action:hover { background: #d5dde8; }
+.mk-btn.action:active { background: #c8d4e0; transform: translateY(1px); box-shadow: none; }
+
+/* Functions toggle */
+.mk-btn.fn-toggle {
+    background: #f1f5f9;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #334155;
+    border-color: #cbd5e1;
+}
+.mk-btn.fn-toggle.active {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+/* Enter / submit */
+.mk-btn.enter {
+    background: #4f46e5;
+    border-color: #4338ca;
+    box-shadow: 0 2px 0 #3730a3;
+    color: #fff;
+}
+.mk-btn.enter:hover { background: #4338ca; }
+.mk-btn.enter:active { background: #3730a3; transform: translateY(1px); box-shadow: none; }
+
+/* Span helpers */
+.mk-span-2-row {
+    grid-row: span 2;
+}
+
+/* Italic for variable letters */
+.mk-btn.italic {
+    font-style: italic;
+}
+
+/* Superscript labels inside buttons */
+.mk-btn .sup { font-size: 0.6rem; vertical-align: super; line-height: 0; }
+
+/* Input display area above keyboard */
+.mk-input-area {
+    width: 100%;
+    min-height: 64px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px 12px 0 0;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    font-size: 1.5rem;
+    font-family: 'KaTeX_Main', 'Times New Roman', serif;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.mk-input-area.mq-focused {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+    outline: none;
+}
+
+@media (max-width: 480px) {
+    .mk-keyboard {
+        grid-template-rows: repeat(4, 38px);
+        font-size: 0.85rem;
+    }
+    .mk-btn { font-size: 0.85rem; }
+    .mk-fn-panel { width: 100%; right: 0; left: 0; }
+}

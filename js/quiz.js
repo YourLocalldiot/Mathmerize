@@ -347,24 +347,77 @@ function initQuiz(quizData, isRandomize) {
                 </div>
             </div>
         `);
-        $('.keypad-container').hide();
+        $('.mk-wrapper, .keypad-container').hide();
         $('#progress-bar').css('width', '100%');
     }
 
-    $('.keypad-btn').on('click touchstart', function(e) {
-        e.preventDefault();
-        const cmd = $(this).attr('data-cmd');
-        if (!cmd) return;
-        mathField.focus();
-        if (cmd === '^2') { mathField.write('^2'); }
-        else if (cmd === '^') { mathField.write('^'); }
-        else if (cmd === '\\frac') { mathField.write('\\frac{ }{ }'); mathField.keystroke('Left'); mathField.keystroke('Left'); }
-        else if (cmd === '\\sqrt') { mathField.write('\\sqrt{ }'); mathField.keystroke('Left'); }
-        else if (['\\sin','\\cos','\\tan','\\csc','\\sec','\\cot','\\ln'].includes(cmd)) { mathField.write(cmd + '\\left(\\right)'); mathField.keystroke('Left'); }
-        else if (cmd.includes('lim')) { mathField.write(cmd); mathField.keystroke('Left'); }
-        else { mathField.write(cmd); }
+    // ---- Keyboard helper ----
+    function execMkCmd(cmd, field) {
+        if (!field) return;
+        field.focus();
+        if (cmd === '^2') { field.write('^2'); }
+        else if (cmd === '^') { field.write('^'); }
+        else if (cmd === '\\frac') { field.write('\\frac{ }{ }'); field.keystroke('Left'); field.keystroke('Left'); }
+        else if (cmd === '\\sqrt') { field.write('\\sqrt{ }'); field.keystroke('Left'); }
+        else if ([
+            '\\sin','\\cos','\\tan','\\csc','\\sec','\\cot','\\ln',
+            '\\arcsin','\\arccos','\\arctan','\\exp','\\log',
+            '\\sinh','\\cosh','\\tanh','\\coth',
+            '\\operatorname{arccsc}','\\operatorname{arcsec}','\\operatorname{arccot}',
+            '\\operatorname{csch}','\\operatorname{sech}',
+            '\\operatorname{lcm}','\\gcd','\\operatorname{mod}',
+            '\\operatorname{round}','\\operatorname{sign}',
+            '\\operatorname{nPr}','\\operatorname{nCr}'
+        ].includes(cmd)) {
+            field.write(cmd + '\\left(\\right)'); field.keystroke('Left');
+        }
+        else if (cmd === '\\lceil') { field.write('\\lceil\\rceil'); field.keystroke('Left'); }
+        else if (cmd === '\\lfloor') { field.write('\\lfloor\\rfloor'); field.keystroke('Left'); }
+        else if (cmd === '\\log_{}') { field.write('\\log_{ }\\left(\\right)'); field.keystroke('Left'); }
+        else if (cmd === '\\frac{d}{dx}') { field.write('\\frac{d}{dx}\\left(\\right)'); field.keystroke('Left'); }
+        else if (cmd === '\\sqrt[]{}') { field.write('\\sqrt[]{ }'); field.keystroke('Left'); }
+        else if (cmd.includes('lim') || cmd.includes('sum') || cmd.includes('int') || cmd.includes('prod')) {
+            field.write(cmd); field.keystroke('Left');
+        }
+        else { field.write(cmd); }
+    }
+
+    // ---- Wire new mk-btn buttons ----
+    document.querySelectorAll('#quiz-mk-wrapper [data-mk-cmd]').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            execMkCmd(this.getAttribute('data-mk-cmd'), mathField);
+        });
+        btn.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            execMkCmd(this.getAttribute('data-mk-cmd'), mathField);
+        }, { passive: false });
     });
 
+    // ---- Functions panel toggle ----
+    const fnToggle = document.getElementById('quiz-fn-toggle');
+    const fnPanel = document.getElementById('quiz-fn-panel');
+    if (fnToggle && fnPanel) {
+        fnToggle.addEventListener('click', () => {
+            const isOpen = fnPanel.classList.toggle('open');
+            fnToggle.classList.toggle('active', isOpen);
+        });
+        // Close panel when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!fnToggle.contains(e.target) && !fnPanel.contains(e.target)) {
+                fnPanel.classList.remove('open');
+                fnToggle.classList.remove('active');
+            }
+        });
+    }
+
+    // ---- Left / Right navigation ----
+    const leftBtn = document.getElementById('quiz-left-btn');
+    const rightBtn = document.getElementById('quiz-right-btn');
+    if (leftBtn) leftBtn.addEventListener('click', () => { mathField.focus(); mathField.keystroke('Left'); });
+    if (rightBtn) rightBtn.addEventListener('click', () => { mathField.focus(); mathField.keystroke('Right'); });
+
+    // ---- Backspace ----
     $('#backspace-btn').on('click touchstart', function(e) {
         e.preventDefault();
         mathField.focus();
