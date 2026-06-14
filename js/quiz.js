@@ -382,16 +382,43 @@ function initQuiz(quizData, isRandomize) {
         else { field.write(cmd); }
     }
 
+    // ---- Keyboard Toggles & State ----
+    let isShifted = false;
+    const abcKeyboard = document.getElementById('quiz-abc-keyboard');
+    const mainKeyboard = document.getElementById('quiz-main-keyboard');
+
+    document.querySelectorAll('.mk-abc-toggle').forEach(btn => {
+        const handler = (e) => { e.preventDefault(); mainKeyboard.classList.add('hidden'); abcKeyboard.classList.add('active'); };
+        btn.addEventListener('click', handler); btn.addEventListener('touchstart', handler, { passive: false });
+    });
+
+    document.querySelectorAll('.mk-num-toggle').forEach(btn => {
+        const handler = (e) => { e.preventDefault(); abcKeyboard.classList.remove('active'); mainKeyboard.classList.remove('hidden'); };
+        btn.addEventListener('click', handler); btn.addEventListener('touchstart', handler, { passive: false });
+    });
+
+    document.querySelectorAll('.mk-shift-btn').forEach(btn => {
+        const handler = (e) => { e.preventDefault(); isShifted = !isShifted; abcKeyboard.classList.toggle('shifted', isShifted); };
+        btn.addEventListener('click', handler); btn.addEventListener('touchstart', handler, { passive: false });
+    });
+
+    document.querySelectorAll('.mk-enter-btn').forEach(btn => {
+        const handler = (e) => { e.preventDefault(); checkAnswer(); };
+        btn.addEventListener('click', handler); btn.addEventListener('touchstart', handler, { passive: false });
+    });
+
     // ---- Wire new mk-btn buttons ----
     document.querySelectorAll('#quiz-mk-wrapper [data-mk-cmd]').forEach(btn => {
-        btn.addEventListener('click', function(e) {
+        const handler = function(e) {
             e.preventDefault();
-            execMkCmd(this.getAttribute('data-mk-cmd'), mathField);
-        });
-        btn.addEventListener('touchstart', function(e) {
-            e.preventDefault();
-            execMkCmd(this.getAttribute('data-mk-cmd'), mathField);
-        }, { passive: false });
+            let cmd = this.getAttribute('data-mk-cmd');
+            if (this.classList.contains('letter') && isShifted) {
+                cmd = cmd.toUpperCase();
+            }
+            execMkCmd(cmd, mathField);
+        };
+        btn.addEventListener('click', handler);
+        btn.addEventListener('touchstart', handler, { passive: false });
     });
 
     // ---- Functions panel toggle ----
@@ -418,7 +445,7 @@ function initQuiz(quizData, isRandomize) {
     if (rightBtn) rightBtn.addEventListener('click', () => { mathField.focus(); mathField.keystroke('Right'); });
 
     // ---- Backspace ----
-    $('#backspace-btn').on('click touchstart', function(e) {
+    $('#backspace-btn, #quiz-abc-keyboard .mk-backspace-btn').on('click touchstart', function(e) {
         e.preventDefault();
         mathField.focus();
         mathField.keystroke('Backspace');

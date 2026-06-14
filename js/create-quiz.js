@@ -523,18 +523,44 @@ $(document).ready(() => {
         updateAllPlaceholders();
     }
 
+    // ---- Keyboard Toggles & State ----
+    let isShifted = false;
+    const abcKeyboard = document.getElementById('edit-abc-keyboard');
+    const mainKeyboard = document.getElementById('edit-main-keyboard');
+
+    document.querySelectorAll('#edit-question-view .mk-abc-toggle').forEach(btn => {
+        const handler = (e) => { e.preventDefault(); mainKeyboard.classList.add('hidden'); abcKeyboard.classList.add('active'); };
+        btn.addEventListener('click', handler); btn.addEventListener('touchstart', handler, { passive: false });
+    });
+
+    document.querySelectorAll('#edit-question-view .mk-num-toggle').forEach(btn => {
+        const handler = (e) => { e.preventDefault(); abcKeyboard.classList.remove('active'); mainKeyboard.classList.remove('hidden'); };
+        btn.addEventListener('click', handler); btn.addEventListener('touchstart', handler, { passive: false });
+    });
+
+    document.querySelectorAll('#edit-question-view .mk-shift-btn').forEach(btn => {
+        const handler = (e) => { e.preventDefault(); isShifted = !isShifted; abcKeyboard.classList.toggle('shifted', isShifted); };
+        btn.addEventListener('click', handler); btn.addEventListener('touchstart', handler, { passive: false });
+    });
+
+    document.querySelectorAll('#edit-question-view .mk-enter-btn').forEach(btn => {
+        const handler = (e) => { e.preventDefault(); $('#save-q-detail-btn').click(); };
+        btn.addEventListener('click', handler); btn.addEventListener('touchstart', handler, { passive: false });
+    });
+
     // Wire new mk-btn buttons
     document.querySelectorAll('#edit-mk-wrapper [data-mk-cmd]').forEach(btn => {
-        btn.addEventListener('click', function(e) {
+        const handler = function(e) {
             e.preventDefault();
             if (!activeMathField) return;
-            execMkCmd(this.getAttribute('data-mk-cmd'), activeMathField);
-        });
-        btn.addEventListener('touchstart', function(e) {
-            e.preventDefault();
-            if (!activeMathField) return;
-            execMkCmd(this.getAttribute('data-mk-cmd'), activeMathField);
-        }, { passive: false });
+            let cmd = this.getAttribute('data-mk-cmd');
+            if (this.classList.contains('letter') && isShifted) {
+                cmd = cmd.toUpperCase();
+            }
+            execMkCmd(cmd, activeMathField);
+        };
+        btn.addEventListener('click', handler);
+        btn.addEventListener('touchstart', handler, { passive: false });
     });
 
     // Functions panel toggle
@@ -564,7 +590,7 @@ $(document).ready(() => {
     });
 
     // Backspace
-    $('#edit-backspace-btn').on('click touchstart', function(e) {
+    $('#edit-backspace-btn, #edit-abc-keyboard .mk-backspace-btn').on('click touchstart', function(e) {
         e.preventDefault();
         if(!activeMathField) return;
         activeMathField.focus();

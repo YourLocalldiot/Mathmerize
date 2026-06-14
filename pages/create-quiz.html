@@ -119,7 +119,7 @@
         <!-- Edit Question View (Hidden by default) -->
         <div id="edit-question-view" class="content-container hidden">
             <!-- Quiz Title is in toolbar, so we just show the card -->
-            <div class="w-full max-w-[576px] mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
+            <div class="w-full max-w-3xl mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
                 <div class="p-4 sm:p-6 pb-4">
                     <div class="flex justify-between items-center mb-4">
                         <span id="edit-q-header" class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest">
@@ -220,7 +220,7 @@
                         </div>
 
                         <!-- Main keyboard grid -->
-                        <div class="mk-keyboard">
+                        <div class="mk-main-keyboard" id="edit-main-keyboard">
                             <!-- === SYMBOL SECTION (cols 1-4) === -->
                             <button class="mk-btn italic" data-mk-cmd="x">x</button>
                             <button class="mk-btn italic" data-mk-cmd="y">y</button>
@@ -267,11 +267,65 @@
                             <button class="mk-btn" data-mk-cmd="\sqrt">√</button>
                             <button class="mk-btn" data-mk-cmd="\frac">a/b</button>
                             <button class="mk-btn" data-mk-cmd="\pi">π</button>
-                            <button class="mk-btn italic" data-mk-cmd="e">e</button>
+                            <button class="mk-btn action mk-abc-toggle" style="font-family: 'Inter', sans-serif; font-size: 0.9rem; font-weight: 500;">A B C</button>
                             <button class="mk-btn num" data-mk-cmd="0">0</button>
                             <button class="mk-btn num" data-mk-cmd=".">.</button>
                             <button class="mk-btn" data-mk-cmd="=">=</button>
                             <button class="mk-btn" data-mk-cmd="+">+</button>
+                        </div>
+
+                        <!-- ABC Letter keyboard grid -->
+                        <div class="mk-abc-keyboard" id="edit-abc-keyboard">
+                            <!-- Row 1 -->
+                            <button class="mk-btn letter italic" data-mk-cmd="q" style="grid-column: span 2;">q</button>
+                            <button class="mk-btn letter italic" data-mk-cmd="w" style="grid-column: span 2;">w</button>
+                            <button class="mk-btn letter italic" data-mk-cmd="e" style="grid-column: span 2;">e</button>
+                            <button class="mk-btn letter italic" data-mk-cmd="r" style="grid-column: span 2;">r</button>
+                            <button class="mk-btn letter italic" data-mk-cmd="t" style="grid-column: span 2;">t</button>
+                            <button class="mk-btn letter italic" data-mk-cmd="y" style="grid-column: span 2;">y</button>
+                            <button class="mk-btn letter italic" data-mk-cmd="u" style="grid-column: span 2;">u</button>
+                            <button class="mk-btn letter italic" data-mk-cmd="i" style="grid-column: span 2;">i</button>
+                            <button class="mk-btn letter italic" data-mk-cmd="o" style="grid-column: span 2;">o</button>
+                            <button class="mk-btn letter italic" data-mk-cmd="p" style="grid-column: span 2;">p</button>
+
+                            <!-- Row 2 -->
+                            <button class="mk-btn letter italic" data-mk-cmd="a" style="grid-column: span 2;">a</button>
+                            <button class="mk-btn letter italic" data-mk-cmd="s" style="grid-column: span 2;">s</button>
+                            <button class="mk-btn letter italic" data-mk-cmd="d" style="grid-column: span 2;">d</button>
+                            <button class="mk-btn letter italic" data-mk-cmd="f" style="grid-column: span 2;">f</button>
+                            <button class="mk-btn letter italic" data-mk-cmd="g" style="grid-column: span 2;">g</button>
+                            <button class="mk-btn letter italic" data-mk-cmd="h" style="grid-column: span 2;">h</button>
+                            <button class="mk-btn letter italic" data-mk-cmd="j" style="grid-column: span 2;">j</button>
+                            <button class="mk-btn letter italic" data-mk-cmd="k" style="grid-column: span 2;">k</button>
+                            <button class="mk-btn letter italic" data-mk-cmd="l" style="grid-column: span 2;">l</button>
+                            <button class="mk-btn italic" data-mk-cmd="\theta" style="grid-column: span 2;">θ</button>
+
+                            <!-- Row 3 -->
+                            <button class="mk-btn action mk-shift-btn" style="grid-column: span 3;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+                            </button>
+                            <button class="mk-btn letter italic" data-mk-cmd="z" style="grid-column: span 2;">z</button>
+                            <button class="mk-btn letter italic" data-mk-cmd="x" style="grid-column: span 2;">x</button>
+                            <button class="mk-btn letter italic" data-mk-cmd="c" style="grid-column: span 2;">c</button>
+                            <button class="mk-btn letter italic" data-mk-cmd="v" style="grid-column: span 2;">v</button>
+                            <button class="mk-btn letter italic" data-mk-cmd="b" style="grid-column: span 2;">b</button>
+                            <button class="mk-btn letter italic" data-mk-cmd="n" style="grid-column: span 2;">n</button>
+                            <button class="mk-btn letter italic" data-mk-cmd="m" style="grid-column: span 2;">m</button>
+                            <button class="mk-btn action mk-backspace-btn" style="grid-column: span 3;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/></svg>
+                            </button>
+
+                            <!-- Row 4 -->
+                            <button class="mk-btn action mk-num-toggle" style="grid-column: span 4; font-family: 'Inter', sans-serif; font-size: 1rem;">1 2 3</button>
+                            <button class="mk-btn" data-mk-cmd="_" style="grid-column: span 2;">a<sub style="font-size: 0.6em;">b</sub></button>
+                            <button class="mk-btn" data-mk-cmd="!" style="grid-column: span 2;">! <span style="font-size: 0.7em; color: #94a3b8;">%</span></button>
+                            <button class="mk-btn" data-mk-cmd="\left[\right]" style="grid-column: span 2;">[ ]</button>
+                            <button class="mk-btn" data-mk-cmd="\left\{\right\}" style="grid-column: span 2;">{ }</button>
+                            <button class="mk-btn" data-mk-cmd=":" style="grid-column: span 2;">~ <span style="font-size: 0.7em; color: #94a3b8;">:</span></button>
+                            <button class="mk-btn" data-mk-cmd="," style="grid-column: span 2;">, <span style="font-size: 0.7em; color: #94a3b8;">'</span></button>
+                            <button class="mk-btn enter mk-enter-btn" style="grid-column: span 4;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 10l-5 5 5 5"/><path d="M20 4v7a4 4 0 0 1-4 4H4"/></svg>
+                            </button>
                         </div>
                     </div>
                     <!-- ==================== END KEYBOARD ====================== -->
