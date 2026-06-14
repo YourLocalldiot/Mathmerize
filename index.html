@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="images/Mathmerize%20logo_Favicon_Purple_White.png" type="image/png">
     <title>Mathmerize - Home</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -95,53 +96,16 @@
     <script>
         const sidebar = document.getElementById('main-sidebar');
         const toggleBtn = document.getElementById('sidebar-toggle');
-        const toggleIcon = document.getElementById('sidebar-toggle-icon');
-        const logoText = document.getElementById('sidebar-logo-text');
-        const linkTexts = document.querySelectorAll('.sidebar-link-text');
         const COLLAPSED_KEY = 'sidebar-collapsed';
 
-        function applyCollapsed(collapsed) {
-            if (collapsed) {
-                sidebar.style.width = '64px';
-                logoText.style.opacity = '0';
-                linkTexts.forEach(el => el.style.opacity = '0');
-                toggleIcon.style.transform = 'rotate(180deg)';
-                // Collapsed nav links: center icon
-                sidebar.querySelectorAll('nav a').forEach(a => {
-                    a.style.justifyContent = 'center';
-                    a.style.padding = '12px';
-                });
-                // Auth: hide text/logout, show only avatar
-                const authText = sidebar.querySelector('.auth-user-text');
-                const logoutBtn = sidebar.querySelector('#logout-btn');
-                if (authText) authText.style.display = 'none';
-                if (logoutBtn) logoutBtn.style.display = 'none';
-                const authContainer = sidebar.querySelector('#auth-container');
-                if (authContainer) { authContainer.style.display = 'flex'; authContainer.style.justifyContent = 'center'; }
-            } else {
-                sidebar.style.width = '256px';
-                logoText.style.opacity = '1';
-                linkTexts.forEach(el => el.style.opacity = '1');
-                toggleIcon.style.transform = 'rotate(0deg)';
-                sidebar.querySelectorAll('nav a').forEach(a => {
-                    a.style.justifyContent = '';
-                    a.style.padding = '';
-                });
-                const authText = sidebar.querySelector('.auth-user-text');
-                const logoutBtn = sidebar.querySelector('#logout-btn');
-                if (authText) authText.style.display = '';
-                if (logoutBtn) logoutBtn.style.display = '';
-                const authContainer = sidebar.querySelector('#auth-container');
-                if (authContainer) { authContainer.style.display = ''; authContainer.style.justifyContent = ''; }
-            }
+        // Apply initial state
+        if (localStorage.getItem(COLLAPSED_KEY) === 'true') {
+            sidebar.classList.add('collapsed');
         }
 
-        applyCollapsed(localStorage.getItem(COLLAPSED_KEY) === 'true');
-
         toggleBtn.addEventListener('click', () => {
-            const isNowCollapsed = sidebar.style.width !== '64px';
-            applyCollapsed(isNowCollapsed);
-            localStorage.setItem(COLLAPSED_KEY, isNowCollapsed);
+            sidebar.classList.toggle('collapsed');
+            localStorage.setItem(COLLAPSED_KEY, sidebar.classList.contains('collapsed'));
         });
     </script>
 </body>
