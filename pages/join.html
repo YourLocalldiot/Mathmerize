@@ -46,8 +46,7 @@
             e.preventDefault();
             const code = document.getElementById('quiz-code-input').value.trim().toUpperCase();
             if (code) {
-                // In the future, this would verify the code and join the quiz or redirect to a play page.
-                alert('Joining quiz with code: ' + code + '\n\n(Playing quiz functionality to be implemented soon)');
+                window.location.href = `quiz.html?code=${encodeURIComponent(code)}`;
             }
         });
     </script>

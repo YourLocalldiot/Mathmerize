@@ -6,7 +6,7 @@
 
 import { auth, db } from './firebase.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
+import { doc, getDoc, collectionGroup, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
 import { signOut } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
 
 /* -------------------------------------------------------
@@ -462,13 +462,43 @@ function initQuiz(quizData, isRandomize) {
    ------------------------------------------------------- */
 const params = new URLSearchParams(window.location.search);
 const quizId = params.get('id');
+const urlCode = params.get('code');
 
 // Show sidebar auth state immediately
 onAuthStateChanged(auth, async (user) => {
     renderAuthSection(user);
 
-    if (quizId && user) {
-        // Load from Firestore
+    if (urlCode) {
+        document.getElementById('quiz-loading').style.display = 'flex';
+        try {
+            const q = query(collectionGroup(db, 'quizzes'), where('code', '==', urlCode));
+            const querySnapshot = await getDocs(q);
+            if (!querySnapshot.empty) {
+                const quizDoc = querySnapshot.docs[0];
+                const data = quizDoc.data();
+                
+                document.title = `${data.title} — Mathmerize`;
+                const titleDisplay = document.getElementById('quiz-title-display');
+                if (titleDisplay) titleDisplay.textContent = data.title;
+
+                if (data.code) {
+                    const codeDisplay = document.getElementById('quiz-code-display');
+                    const codeBox = document.getElementById('quiz-code-box-display');
+                    if (codeDisplay && codeBox) {
+                        codeDisplay.textContent = data.code;
+                        codeBox.classList.remove('hidden');
+                    }
+                }
+                $(document).ready(() => initQuiz([...data.questions], data.randomize));
+            } else {
+                showError('Quiz not found. Check your code.');
+            }
+        } catch (err) {
+            console.error(err);
+            showError('Failed to load quiz. Check your connection.');
+        }
+    } else if (quizId && user) {
+        // Load from Firestore using ID
         document.getElementById('quiz-loading').style.display = 'flex';
         try {
             const quizDoc = await getDoc(doc(db, 'users', user.uid, 'quizzes', quizId));
