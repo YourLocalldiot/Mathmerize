@@ -6,7 +6,7 @@
 
 import { auth, db } from './firebase.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
-import { doc, getDoc, collectionGroup, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
+import { doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
 import { signOut } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
 
 /* -------------------------------------------------------
@@ -471,7 +471,7 @@ onAuthStateChanged(auth, async (user) => {
     if (urlCode) {
         document.getElementById('quiz-loading').style.display = 'flex';
         try {
-            const q = query(collectionGroup(db, 'quizzes'), where('code', '==', urlCode));
+            const q = query(collection(db, 'quizzes'), where('code', '==', urlCode));
             const querySnapshot = await getDocs(q);
             if (!querySnapshot.empty) {
                 const quizDoc = querySnapshot.docs[0];
@@ -497,11 +497,11 @@ onAuthStateChanged(auth, async (user) => {
             console.error(err);
             showError('Failed to load quiz. Check your connection.');
         }
-    } else if (quizId && user) {
+    } else if (quizId) {
         // Load from Firestore using ID
         document.getElementById('quiz-loading').style.display = 'flex';
         try {
-            const quizDoc = await getDoc(doc(db, 'users', user.uid, 'quizzes', quizId));
+            const quizDoc = await getDoc(doc(db, 'quizzes', quizId));
             if (quizDoc.exists()) {
                 const data = quizDoc.data();
                 // Update page title with quiz name

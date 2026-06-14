@@ -2,7 +2,7 @@ import { auth, db } from './firebase.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
 import {
     collection, getDocs, addDoc, deleteDoc, doc,
-    serverTimestamp, query, orderBy
+    serverTimestamp, query, orderBy, where
 } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
 
 /* -------------------------------------------------------
@@ -225,7 +225,7 @@ window.deleteQuiz = async function(quizId, btn) {
     try {
         const uid = auth.currentUser?.uid;
         if (!uid) return;
-        await deleteDoc(doc(db, 'users', uid, 'quizzes', quizId));
+        await deleteDoc(doc(db, 'quizzes', quizId));
         // Remove the item from DOM
         const item = btn.closest('.quiz-item');
         item.style.transition = 'opacity 0.3s';
@@ -262,10 +262,10 @@ onAuthStateChanged(auth, async (user) => {
     document.getElementById('new-quiz-btn').style.display = 'flex';
 
     const uid = user.uid;
-    const quizzesRef = collection(db, 'users', uid, 'quizzes');
+    const quizzesRef = collection(db, 'quizzes');
 
     try {
-        const q = query(quizzesRef, orderBy('createdAt', 'desc'));
+        const q = query(quizzesRef, where('ownerId', '==', uid));
         const snapshot = await getDocs(q);
 
         let quizzes = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -273,15 +273,23 @@ onAuthStateChanged(auth, async (user) => {
         // Seed default quiz for brand-new users
         if (quizzes.length === 0) {
             const newDocRef = await addDoc(quizzesRef, {
+                ownerId: uid,
                 title: DEFAULT_QUIZ.title,
                 questions: DEFAULT_QUIZ.questions,
                 code: generateCode(),
                 createdAt: serverTimestamp()
             });
             // Re-fetch to get real timestamp
-            const freshSnapshot = await getDocs(query(quizzesRef, orderBy('createdAt', 'desc')));
+            const freshSnapshot = await getDocs(query(quizzesRef, where('ownerId', '==', uid)));
             quizzes = freshSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
         }
+
+        // Sort locally to avoid composite index requirements
+        quizzes.sort((a, b) => {
+            const timeA = a.createdAt?.toMillis() || 0;
+            const timeB = b.createdAt?.toMillis() || 0;
+            return timeB - timeA;
+        });
 
         renderQuizList(quizzes);
 

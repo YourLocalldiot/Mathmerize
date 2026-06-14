@@ -308,7 +308,7 @@ async function saveQuiz() {
     saveSpinner.classList.remove('hidden');
 
     try {
-        const quizzesRef = doc(db, 'users', uid, 'quizzes', quizId);
+        const quizzesRef = doc(db, 'quizzes', quizId);
         
         await updateDoc(quizzesRef, {
             title: quizData.title,
@@ -322,6 +322,7 @@ async function saveQuiz() {
                 for (let i = 0; i < 7; i++) code += chars[Math.floor(Math.random() * chars.length)];
                 
                 await setDoc(quizzesRef, {
+                    ownerId: uid,
                     title: quizData.title,
                     questions: quizData.questions,
                     randomize: !!quizData.randomize,
@@ -356,9 +357,15 @@ onAuthStateChanged(auth, async (user) => {
         if (urlId) {
             quizId = urlId;
             try {
-                const quizDoc = await getDoc(doc(db, 'users', user.uid, 'quizzes', quizId));
+                const quizDoc = await getDoc(doc(db, 'quizzes', quizId));
                 if (quizDoc.exists()) {
-                    quizData = quizDoc.data();
+                    const data = quizDoc.data();
+                    if (data.ownerId && data.ownerId !== user.uid) {
+                        showToast('Unauthorized: You do not own this quiz.');
+                        window.location.href = 'library.html';
+                        return;
+                    }
+                    quizData = data;
                     renderQuestions();
                 } else {
                     showToast('Quiz not found.');
@@ -372,17 +379,17 @@ onAuthStateChanged(auth, async (user) => {
             quizId = generateId(); // Generate a temp ID
             quizData.questions = [...DEFAULT_QUESTIONS];
             
-            // Auto-create doc in Firestore right away to establish it? Or just let 'not-found' handler create it on save.
-            // Let's create it right away so we have a valid ID and createdAt.
             const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
             let code = '';
             for (let i = 0; i < 7; i++) code += chars[Math.floor(Math.random() * chars.length)];
             
             try {
-                await setDoc(doc(db, 'users', user.uid, 'quizzes', quizId), {
-                    title: quizData.title,
+                // Initialize doc
+                await setDoc(doc(db, 'quizzes', quizId), {
+                    ownerId: user.uid,
+                    title: quizData.title || "Untitled Quiz",
                     questions: quizData.questions,
-                    randomize: !!quizData.randomize,
+                    randomize: false,
                     code: code,
                     createdAt: serverTimestamp()
                 });
