@@ -140,6 +140,25 @@ function renderQuestions() {
     
     questionsList.innerHTML = '';
     
+    if (quizData.questions.length === 0) {
+        questionsList.innerHTML = `
+            <div class="empty-state" style="text-align: center; padding: 40px 20px;">
+                <svg width="100" height="100" fill="none" stroke="url(#create-gradient)" viewBox="0 0 24 24" style="margin: 0 auto 20px; filter: drop-shadow(0 10px 15px rgba(99,102,241,0.2));">
+                    <defs>
+                        <linearGradient id="create-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#818cf8" />
+                            <stop offset="100%" stop-color="#4f46e5" />
+                        </linearGradient>
+                    </defs>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"/>
+                </svg>
+                <h3 style="font-size: 1.5rem; font-weight: 700; color: #1e293b; margin-bottom: 8px;">No questions yet</h3>
+                <p style="color: #64748b; font-size: 1rem; margin-bottom: 0;">Click <strong>Create question</strong> to add your first one.</p>
+            </div>
+        `;
+        return;
+    }
+
     quizData.questions.forEach((q, index) => {
         const qNumStr = String(index + 1).padStart(2, '0');
         const card = document.createElement('div');
