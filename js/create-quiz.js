@@ -354,6 +354,10 @@ onAuthStateChanged(auth, async (user) => {
     renderAuthSection(user);
 
     if (user) {
+        // Hide login prompt
+        const loginPrompt = document.getElementById('login-prompt');
+        if (loginPrompt) loginPrompt.style.display = 'none';
+
         if (urlId) {
             quizId = urlId;
             try {
@@ -404,7 +408,14 @@ onAuthStateChanged(auth, async (user) => {
             }
         }
     } else {
-        showToast('Please log in to create or edit quizzes.');
+        // Show login prompt instead of the creator interface
+        const toolbar = document.getElementById('quiz-toolbar');
+        const content = document.getElementById('quiz-content');
+        const loginPrompt = document.getElementById('login-prompt');
+        
+        if (toolbar) toolbar.style.display = 'none';
+        if (content) content.style.display = 'none';
+        if (loginPrompt) loginPrompt.style.display = 'block';
     }
 });
 

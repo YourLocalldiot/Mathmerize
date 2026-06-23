@@ -336,6 +336,11 @@ function initQuiz(quizData, isRandomize) {
     }
 
     function showResults() {
+        const isGuest = !auth.currentUser;
+        const actionBtn = isGuest 
+            ? `<a href="auth.html" class="bg-white border border-slate-200 text-slate-700 px-8 py-3 rounded-xl font-bold shadow-md hover:bg-slate-50">Log in</a>`
+            : `<a href="library.html" class="bg-white border border-slate-200 text-slate-700 px-8 py-3 rounded-xl font-bold shadow-md hover:bg-slate-50">My Library</a>`;
+
         $('.p-4.sm\\:p-6').html(`
             <div class="text-center py-8">
                 <div class="text-4xl mb-3">🏅</div>
@@ -343,7 +348,7 @@ function initQuiz(quizData, isRandomize) {
                 <p class="text-slate-500 mb-6">Final Score: <span class="font-bold text-indigo-600">${score}/${totalQ}</span></p>
                 <div class="flex gap-3 justify-center">
                     <button onclick="location.reload()" class="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold shadow-md hover:bg-indigo-700">Restart Quiz</button>
-                    <a href="library.html" class="bg-white border border-slate-200 text-slate-700 px-8 py-3 rounded-xl font-bold shadow-md hover:bg-slate-50">My Library</a>
+                    ${actionBtn}
                 </div>
             </div>
         `);
