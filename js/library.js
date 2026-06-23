@@ -270,19 +270,7 @@ onAuthStateChanged(auth, async (user) => {
 
         let quizzes = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 
-        // Seed default quiz for brand-new users
-        if (quizzes.length === 0) {
-            const newDocRef = await addDoc(quizzesRef, {
-                ownerId: uid,
-                title: DEFAULT_QUIZ.title,
-                questions: DEFAULT_QUIZ.questions,
-                code: generateCode(),
-                createdAt: serverTimestamp()
-            });
-            // Re-fetch to get real timestamp
-            const freshSnapshot = await getDocs(query(quizzesRef, where('ownerId', '==', uid)));
-            quizzes = freshSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-        }
+        // Removed default quiz seeding
 
         // Sort locally to avoid composite index requirements
         quizzes.sort((a, b) => {

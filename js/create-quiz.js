@@ -11,9 +11,7 @@ let quizData = {
 let quizId = null;
 let hasUnsavedChanges = false;
 
-const DEFAULT_QUESTIONS = [
-    { prompt: "Evaluate the equation", text: "1+2x3", answer: "7" }
-];
+const DEFAULT_QUESTIONS = [];
 
 // Elements
 const titleInput = document.getElementById('quiz-title-input');
@@ -261,12 +259,14 @@ function openEditView(index = -1) {
         editQPrompt.value = '';
         editEquationField.latex('');
         editMathField.latex('');
+        document.getElementById('edit-q-force-answer').checked = false;
     } else {
         const q = quizData.questions[index];
         editQHeader.textContent = `QUESTION ${index + 1} / ${quizData.questions.length}`;
         editQPrompt.value = q.prompt ? q.prompt.replace(/\\ /g, ' ') : '';
         editEquationField.latex(q.text || '');
         editMathField.latex(q.answer || '');
+        document.getElementById('edit-q-force-answer').checked = !!q.forceAnswer;
     }
     updateAllPlaceholders();
     activeMathField = editQPrompt;
@@ -437,6 +437,7 @@ saveQDetailBtn.addEventListener('click', () => {
     const promptText = editQPrompt.value.trim();
     const equationText = editEquationField.latex().trim();
     const answerLatex = editMathField.latex().trim();
+    const forceAnswer = document.getElementById('edit-q-force-answer').checked;
 
     if (!promptText && !equationText && !answerLatex) {
         showToast("Please enter question details.");
@@ -446,7 +447,8 @@ saveQDetailBtn.addEventListener('click', () => {
     const newQ = {
         prompt: promptText,
         text: equationText,
-        answer: answerLatex
+        answer: answerLatex,
+        forceAnswer: forceAnswer
     };
 
     if (editingQuestionIndex === -1) {
