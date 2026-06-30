@@ -75,14 +75,7 @@
             mask-position: left;
         }
         .sidebar.collapsed .sidebar-logo-image {
-            width: 32px;
-            height: 32px;
-            -webkit-mask-image: url('../images/Mathmerize%20logo%20square%20colored.png');
-            -webkit-mask-size: contain;
-            -webkit-mask-position: center;
-            mask-image: url('../images/Mathmerize%20logo%20square%20colored.png');
-            mask-size: contain;
-            mask-position: center;
+            display: none;
         }
         .sidebar.collapsed .sidebar-logo-text { opacity: 0; width: 0; }
 
@@ -114,7 +107,7 @@
         .nav-link.active { background: #eef2ff; color: #4f46e5; }
         .nav-link svg { flex-shrink: 0; }
         .nav-link span { transition: opacity 0.2s; }
-        .sidebar.collapsed .nav-link span { opacity: 0; }
+        .sidebar.collapsed .nav-link span { display: none; }
         /* Center icons when collapsed */
         .sidebar.collapsed .nav-link { justify-content: center; padding: 12px; }
         .sidebar-nav { flex: 1; padding: 16px; margin-top: 0; }
