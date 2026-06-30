@@ -150,21 +150,24 @@
 
                     <div class="mb-4 flex flex-col gap-3">
                         <div class="relative w-full">
-                            <input type="text" id="edit-q-prompt" class="w-full text-center text-sm sm:text-base font-medium text-slate-700 border border-slate-200 rounded-xl p-3 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 outline-none transition-all latex-font bg-white" placeholder="Type the question...">
+                            <input type="text" id="edit-q-prompt" class="w-full text-center text-lg sm:text-xl font-medium text-slate-700 border border-slate-200 rounded-xl p-3 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 outline-none transition-all latex-font bg-white" placeholder="Type the question...">
                         </div>
                         <div class="relative w-full">
-                            <div id="edit-q-equation" class="w-full text-center text-xl sm:text-3xl font-bold text-slate-800 border border-slate-200 rounded-xl p-3 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 outline-none transition-all latex-font bg-white"></div>
-                            <div id="edit-q-equation-placeholder" class="absolute inset-0 flex items-center justify-center text-slate-400 pointer-events-none z-0 latex-font text-xl sm:text-3xl">Type the equation...</div>
+                            <div id="edit-q-equation" class="w-full text-center text-lg sm:text-xl font-medium text-slate-800 border border-slate-200 rounded-xl p-3 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 outline-none transition-all latex-font bg-white"></div>
+                            <div id="edit-q-equation-placeholder" class="absolute inset-0 flex items-center justify-center text-slate-400 pointer-events-none z-0 latex-font text-lg sm:text-xl font-medium">Type the equation...</div>
                         </div>
                         <label class="flex items-center gap-2 text-sm font-medium text-slate-600 mt-1 mb-2 justify-center cursor-pointer">
-                            <input type="checkbox" id="edit-q-force-answer" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
-                            Force given correct answer
+                            <input type="checkbox" id="edit-q-random-eval" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
+                            Random numerical evaluation for equation
                         </label>
+                        <div id="edit-q-eval-variable-container" class="relative w-full hidden">
+                            <input type="text" id="edit-q-eval-variable" class="w-full text-center text-lg sm:text-xl font-medium text-slate-700 border border-slate-200 rounded-xl p-3 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 outline-none transition-all latex-font bg-white" placeholder="Type the variable for evaluation">
+                        </div>
                     </div>
 
                     <div class="relative w-full">
-                        <div id="edit-math-field" class="latex-font relative z-10 bg-transparent"></div>
-                        <div id="edit-math-placeholder" class="absolute inset-0 flex items-center justify-center text-slate-400 text-sm sm:text-base font-medium pointer-events-none z-0 latex-font">Type the answer...</div>
+                        <div id="edit-math-field" class="latex-font relative z-10 bg-transparent text-lg sm:text-xl font-medium"></div>
+                        <div id="edit-math-placeholder" class="absolute inset-0 flex items-center justify-center text-slate-400 text-lg sm:text-xl font-medium pointer-events-none z-0 latex-font">Type the answer...</div>
                     </div>
 
                     <!-- ===================== MATH KEYBOARD ===================== -->

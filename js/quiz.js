@@ -247,7 +247,54 @@ function initQuiz(quizData, isRandomize) {
         let expectedParts = expected.split('=');
         let isCorrect = false;
 
-        if (expectedParts.length === 1) {
+        if (quizData[currentIndex].randomEval && quizData[currentIndex].evalVariable) {
+            let evalVar = quizData[currentIndex].evalVariable;
+            
+            let exprUser, exprExpected;
+            if (userParts.length === 2) {
+                exprUser = `(${latexToMathJS(userParts[0])})-(${latexToMathJS(userParts[1])})`;
+            } else {
+                exprUser = latexToMathJS(userInput);
+            }
+            
+            if (expectedParts.length === 2) {
+                exprExpected = `(${latexToMathJS(expectedParts[0])})-(${latexToMathJS(expectedParts[1])})`;
+            } else {
+                exprExpected = latexToMathJS(expected);
+            }
+            
+            let testValues = [
+                -1 * (Math.random() * 9 + 1), // Negative float
+                0,                            // Zero
+                Math.random() * 9 + 1,        // Positive float 1
+                Math.random() * 9 + 1         // Positive float 2
+            ];
+            
+            try {
+                let allMatch = true;
+                for (let val of testValues) {
+                    let scope = {};
+                    scope[evalVar] = val;
+                    let valU = math.evaluate(exprUser, scope);
+                    let valE = math.evaluate(exprExpected, scope);
+                    
+                    if (userParts.length === 2 && expectedParts.length === 2) {
+                        if (Math.abs(valU - valE) > 1e-6 && Math.abs(valU + valE) > 1e-6) {
+                            allMatch = false;
+                            break;
+                        }
+                    } else {
+                        if (Math.abs(valU - valE) > 1e-6) {
+                            allMatch = false;
+                            break;
+                        }
+                    }
+                }
+                isCorrect = allMatch;
+            } catch (e) {
+                isCorrect = false;
+            }
+        } else if (expectedParts.length === 1) {
             if (userParts.length === 1) {
                 isCorrect = areEquivalent(userParts[0], expectedParts[0]);
             }

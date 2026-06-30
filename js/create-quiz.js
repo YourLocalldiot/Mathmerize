@@ -278,14 +278,23 @@ function openEditView(index = -1) {
         editQPrompt.value = '';
         editEquationField.latex('');
         editMathField.latex('');
-        document.getElementById('edit-q-force-answer').checked = false;
+        document.getElementById('edit-q-random-eval').checked = false;
+        document.getElementById('edit-q-eval-variable-container').classList.add('hidden');
+        document.getElementById('edit-q-eval-variable').value = '';
     } else {
         const q = quizData.questions[index];
         editQHeader.textContent = `QUESTION ${index + 1} / ${quizData.questions.length}`;
         editQPrompt.value = q.prompt ? q.prompt.replace(/\\ /g, ' ') : '';
         editEquationField.latex(q.text || '');
         editMathField.latex(q.answer || '');
-        document.getElementById('edit-q-force-answer').checked = !!q.forceAnswer;
+        document.getElementById('edit-q-random-eval').checked = !!q.randomEval;
+        if (q.randomEval) {
+            document.getElementById('edit-q-eval-variable-container').classList.remove('hidden');
+            document.getElementById('edit-q-eval-variable').value = q.evalVariable || '';
+        } else {
+            document.getElementById('edit-q-eval-variable-container').classList.add('hidden');
+            document.getElementById('edit-q-eval-variable').value = '';
+        }
     }
     updateAllPlaceholders();
     activeMathField = editQPrompt;
@@ -452,11 +461,32 @@ document.getElementById('add-q-btn').addEventListener('click', () => {
 
 cancelEditBtn.addEventListener('click', closeEditView);
 
+document.getElementById('edit-q-random-eval').addEventListener('change', function() {
+    const container = document.getElementById('edit-q-eval-variable-container');
+    if (this.checked) {
+        container.classList.remove('hidden');
+    } else {
+        container.classList.add('hidden');
+    }
+});
+
 saveQDetailBtn.addEventListener('click', () => {
     const promptText = editQPrompt.value.trim();
     const equationText = editEquationField.latex().trim();
     const answerLatex = editMathField.latex().trim();
-    const forceAnswer = document.getElementById('edit-q-force-answer').checked;
+    const randomEval = document.getElementById('edit-q-random-eval').checked;
+    const evalVariable = document.getElementById('edit-q-eval-variable').value.trim();
+
+    if (randomEval) {
+        if (!evalVariable) {
+            showToast("Please specify the variable for evaluation.");
+            return;
+        }
+        if (!answerLatex.includes(evalVariable)) {
+            showToast("Mismatch: The specified variable does not appear in the answer.");
+            return;
+        }
+    }
 
     if (!promptText && !equationText && !answerLatex) {
         showToast("Please enter question details.");
@@ -467,7 +497,8 @@ saveQDetailBtn.addEventListener('click', () => {
         prompt: promptText,
         text: equationText,
         answer: answerLatex,
-        forceAnswer: forceAnswer
+        randomEval: randomEval,
+        evalVariable: evalVariable
     };
 
     if (editingQuestionIndex === -1) {
