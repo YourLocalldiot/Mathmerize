@@ -58,6 +58,14 @@ body {
     display: none;
 }
 
+.home-logo {
+    width: 280px; height: 60px;
+}
+
+@media (min-width: 640px) {
+    .home-logo { width: 380px; height: 80px; }
+}
+
 .mesh-bg {
     background-color: #ffffff;
     background-image: 

@@ -407,3 +407,25 @@ body {
     pointer-events: none;
 }
 .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+@media (max-width: 768px) {
+    /* Force sidebar collapsed on mobile */
+    .sidebar { width: 64px !important; }
+    .sidebar-logo-image { display: none !important; }
+    .sidebar-logo-text { opacity: 0; width: 0; }
+    .sidebar-toggle { display: none !important; }
+    .nav-link span { display: none !important; }
+    .nav-link { justify-content: center; padding: 12px; }
+    .auth-section { display: flex; align-items: center; justify-content: center; }
+    .auth-user-text, #logout-btn { display: none !important; }
+    .auth-section a { padding: 8px; justify-content: center; width: auto; }
+    .auth-section a span { display: none !important; }
+    
+    /* Library list tweaks */
+    .list-header { display: none; }
+    .quiz-item { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px; }
+    .quiz-info { width: 100%; }
+    .col-code, .col-date { width: 100%; text-align: left; }
+    .col-actions { width: 100%; justify-content: flex-start; margin-top: 4px; }
+    .main-content { padding: 20px; }
+}

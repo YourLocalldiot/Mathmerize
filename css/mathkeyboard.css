@@ -248,8 +248,13 @@
 @media (max-width: 480px) {
     .mk-main-keyboard, .mk-abc-keyboard {
         grid-template-rows: repeat(4, 38px);
-        font-size: 0.85rem;
+        gap: 4px;
+        padding: 6px;
     }
-    .mk-btn { font-size: 0.85rem; }
+    .mk-btn { font-size: 0.8rem; }
     .mk-fn-panel { width: 100%; right: 0; left: 0; }
+}
+@media (max-width: 360px) {
+    .mk-btn { font-size: 0.75rem; }
+    .mk-main-keyboard, .mk-abc-keyboard { gap: 3px; padding: 4px; }
 }

@@ -460,3 +460,22 @@ body {
 .mq-editable-field, .mq-math-mode {
     font-family: 'KaTeX_Main', 'Times New Roman', serif !important;
 }
+
+@media (max-width: 768px) {
+    /* Force sidebar collapsed on mobile */
+    .sidebar { width: 64px !important; }
+    .sidebar-logo-image { display: none !important; }
+    .sidebar-logo-text { opacity: 0; width: 0; }
+    .sidebar-toggle { display: none !important; }
+    .nav-link span { display: none !important; }
+    .nav-link { justify-content: center; padding: 12px; }
+    .auth-section { display: flex; align-items: center; justify-content: center; }
+    .auth-user-text, #logout-btn { display: none !important; }
+    .auth-section a { padding: 8px; justify-content: center; width: auto; }
+    .auth-section a span { display: none !important; }
+
+    /* Create Quiz specific tweaks */
+    .toolbar { flex-wrap: wrap; padding: 12px; gap: 8px; }
+    .toolbar-left, .toolbar-right { width: 100%; justify-content: space-between; }
+    .quiz-title-input { flex: 1; margin-left: 8px; }
+}
