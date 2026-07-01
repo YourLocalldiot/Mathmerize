@@ -86,10 +86,25 @@ function renderAuthSection(user) {
     const skeleton = document.getElementById('auth-skeleton');
     if (skeleton) skeleton.remove();
 
+    // Update mobile nav account tab avatar
+    const navAccountAvatar = document.getElementById('nav-account-avatar');
+    const navAccountLink = document.getElementById('nav-account-link');
+
     if (user) {
         const displayName = user.displayName || 'User';
         const initial = displayName.charAt(0).toUpperCase();
         const email = user.email || '';
+
+        // Set avatar initial in mobile nav tab
+        if (navAccountAvatar) {
+            navAccountAvatar.innerHTML = initial;
+            navAccountAvatar.style.background = '#eef2ff';
+            navAccountAvatar.style.color = '#4f46e5';
+        }
+        if (navAccountLink) {
+            navAccountLink.href = '#';
+            navAccountLink.onclick = (e) => { e.preventDefault(); };
+        }
         container.innerHTML = `
             <div style="display:flex;align-items:center;justify-content:space-between;">
                 <div class="auth-user-info" style="display:flex;align-items:center;gap:10px;min-width:0;">

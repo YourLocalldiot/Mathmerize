@@ -5,11 +5,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const authContainer = document.getElementById('auth-container');
 
     onAuthStateChanged(auth, (user) => {
+        const navAccountAvatar = document.getElementById('nav-account-avatar');
+        const navAccountLink = document.getElementById('nav-account-link');
+
         if (user) {
             // User is signed in
             const displayName = user.displayName || 'User';
             const initial = displayName.charAt(0).toUpperCase();
             const email = user.email || '';
+
+            // Set avatar initial in mobile nav tab
+            if (navAccountAvatar) {
+                navAccountAvatar.innerHTML = initial;
+                navAccountAvatar.style.background = '#eef2ff';
+                navAccountAvatar.style.color = '#4f46e5';
+            }
+            if (navAccountLink) {
+                navAccountLink.href = '#';
+                navAccountLink.onclick = (e) => { e.preventDefault(); };
+            }
 
             authContainer.innerHTML = `
                 <div class="flex items-center justify-between">

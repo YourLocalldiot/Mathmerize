@@ -108,6 +108,22 @@ body {
 .sidebar.collapsed .nav-link { justify-content: center; padding: 12px; }
 .sidebar-nav { flex: 1; padding: 16px; margin-top: 0; }
 
+/* Account tab: hidden on desktop */
+.nav-account { display: none !important; }
+.nav-account-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #eef2ff;
+    color: #6366f1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.7rem;
+    flex-shrink: 0;
+}
+
 /* Auth section */
 .auth-section { padding: 16px; border-top: 1px solid #e2e8f0; }
 /* Collapsed: center avatar, hide text + logout */
@@ -458,19 +474,11 @@ body {
         width: auto !important;
     }
     
-    .auth-section { 
-        display: flex; 
-        align-items: center; 
-        justify-content: center; 
-        padding: 0 16px;
-        border-top: none;
-        border-left: 1px solid #e2e8f0;
-        flex-shrink: 0;
-    }
-    .auth-user-text, #logout-btn { display: none !important; }
-    .auth-section a { padding: 8px; justify-content: center; width: auto; }
-    .auth-section a span { display: none !important; }
-    
+    .auth-section { display: none !important; }
+
+    /* Show account tab on mobile */
+    .nav-account { display: flex !important; }
+
     body { padding-bottom: 64px; }
 
     /* ---- Main content padding ---- */
@@ -488,10 +496,10 @@ body {
         border-radius: 16px !important;
     }
 
-    /* Larger rounded-square icon on mobile */
+    /* Uniform 36px height for quiz icon, play, and 3-dot on mobile */
     .quiz-icon {
-        width: 48px !important;
-        height: 48px !important;
+        width: 42px !important;
+        height: 42px !important;
         border-radius: 12px !important;
     }
     
@@ -542,10 +550,10 @@ body {
         gap: 6px !important;
         flex-shrink: 0;
     }
-    /* Rounded-square play button (not circle) to match mockup */
+    /* Rounded-square play button to match mockup */
     .btn-play {
-        width: 40px;
-        height: 40px;
+        width: 36px;
+        height: 36px;
         padding: 0 !important;
         border-radius: 10px !important;
         justify-content: center;
@@ -554,10 +562,15 @@ body {
 
     /* Three-dot button sizing */
     .btn-icon {
-        width: 28px !important;
+        width: 24px !important;
         height: 36px !important;
         border: 1px solid #e2e8f0 !important;
         background: #fff !important;
         border-radius: 8px !important;
+    }
+
+    /* Reduce quiz list container padding */
+    .quiz-list {
+        gap: 2px !important;
     }
 }

@@ -58,6 +58,22 @@ body {
     display: none;
 }
 
+/* Account tab: hidden on desktop */
+.nav-account-link { display: none !important; }
+.nav-account-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #eef2ff;
+    color: #6366f1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.7rem;
+    flex-shrink: 0;
+}
+
 .home-logo {
     width: 280px; height: 60px;
 }
@@ -159,19 +175,13 @@ body {
         width: auto !important;
     }
     
-    /* Auth section in bottom bar */
-    #auth-container { 
-        display: flex !important; 
-        align-items: center !important; 
-        justify-content: center !important; 
-        padding: 0 16px !important;
-        border-top: none !important;
-        border-left: 1px solid #e2e8f0 !important;
-        flex-shrink: 0 !important;
+    /* Auth section: hide on mobile, account tab handles it */
+    #auth-container {
+        display: none !important;
     }
-    #auth-container .auth-user-text, #auth-container #logout-btn { display: none !important; }
-    #auth-container a { padding: 8px !important; justify-content: center !important; width: auto !important; }
-    #auth-container a span { display: none !important; }
+
+    /* Show account tab on mobile */
+    .nav-account-link { display: flex !important; }
     
     body { padding-bottom: 64px; }
 }
