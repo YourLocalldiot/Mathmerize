@@ -224,6 +224,7 @@ body {
     color: #64748b;
 }
 .quiz-meta span { display: flex; align-items: center; gap: 3px; }
+.quiz-meta-mobile { display: none; }
 
 /* ---- Share Code Badge ---- */
 .quiz-code {
@@ -409,7 +410,7 @@ body {
 .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
 @media (max-width: 768px) {
-    /* Change sidebar to bottom nav on mobile */
+    /* ---- Bottom Nav (shared across pages) ---- */
     .sidebar {
         width: 100% !important;
         height: 64px !important;
@@ -422,33 +423,37 @@ body {
         border-top: 1px solid #e2e8f0;
         z-index: 50;
         background: #fff;
+        overflow: visible !important;
     }
     .sidebar-header { display: none !important; }
     .sidebar-logo-image, .sidebar-logo-text { display: none !important; }
     .sidebar-toggle { display: none !important; }
     
     .sidebar-nav {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-evenly;
-        align-items: center;
-        padding: 0;
-        margin: 0;
-        flex: 1;
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: space-evenly !important;
+        align-items: center !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        flex: 1 !important;
+        gap: 0 !important;
+        height: 100% !important;
     }
     
     .nav-link {
-        flex-direction: column;
-        gap: 2px;
-        padding: 4px;
-        justify-content: center;
-        align-items: center;
-        margin-bottom: 0;
+        flex-direction: column !important;
+        gap: 2px !important;
+        padding: 8px 16px !important;
+        justify-content: center !important;
+        align-items: center !important;
+        margin-bottom: 0 !important;
+        overflow: visible !important;
     }
     
     .nav-link span { 
         display: block !important; 
-        font-size: 0.65rem; 
+        font-size: 0.65rem !important; 
         opacity: 1 !important;
         width: auto !important;
     }
@@ -460,18 +465,98 @@ body {
         padding: 0 16px;
         border-top: none;
         border-left: 1px solid #e2e8f0;
+        flex-shrink: 0;
     }
     .auth-user-text, #logout-btn { display: none !important; }
     .auth-section a { padding: 8px; justify-content: center; width: auto; }
     .auth-section a span { display: none !important; }
     
     body { padding-bottom: 64px; }
+
+    /* ---- Main content padding ---- */
+    main { padding: 20px 16px !important; }
+    .page-header { margin-bottom: 20px; }
     
-    /* Library list tweaks */
+    /* ---- Library list mobile layout ---- */
     .list-header { display: none; }
-    .quiz-item { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px; }
-    .quiz-info { width: 100%; }
-    .col-code, .col-date { width: 100%; text-align: left; }
-    .col-actions { width: 100%; justify-content: flex-start; margin-top: 4px; }
-    .main-content { padding: 20px; }
+    
+    .quiz-item {
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 12px !important;
+        padding: 14px !important;
+        border-radius: 16px !important;
+    }
+
+    /* Larger rounded-square icon on mobile */
+    .quiz-icon {
+        width: 48px !important;
+        height: 48px !important;
+        border-radius: 12px !important;
+    }
+    
+    /* Hide separate code and date columns — they move into meta */
+    .quiz-code { display: none !important; }
+    .quiz-date { display: none !important; }
+    
+    .quiz-info { flex: 1; min-width: 0; }
+    .quiz-name {
+        font-size: 0.95rem !important;
+        font-weight: 600 !important;
+    }
+    
+    /* Mobile meta line: time • Qs • code (populated via JS .quiz-meta-mobile) */
+    .quiz-meta-mobile {
+        display: flex !important;
+        align-items: center;
+        gap: 6px;
+        margin-top: 4px;
+        font-size: 0.72rem;
+        color: #94a3b8;
+    }
+    .quiz-meta-mobile .meta-dot {
+        width: 3px;
+        height: 3px;
+        border-radius: 50%;
+        background: #cbd5e1;
+        flex-shrink: 0;
+    }
+    .quiz-meta-mobile .meta-code {
+        font-family: 'Courier New', monospace;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        font-size: 0.65rem;
+        color: #64748b;
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        padding: 1px 6px;
+    }
+    
+    /* Hide desktop meta, show mobile meta */
+    .quiz-meta { display: none !important; }
+
+    /* Actions: play icon only + three dots */
+    .quiz-actions {
+        width: auto !important;
+        gap: 6px !important;
+        flex-shrink: 0;
+    }
+    /* Rounded-square play button (not circle) to match mockup */
+    .btn-play {
+        width: 40px;
+        height: 40px;
+        padding: 0 !important;
+        border-radius: 10px !important;
+        justify-content: center;
+    }
+    .btn-play .play-text { display: none !important; }
+
+    /* Three-dot button sizing */
+    .btn-icon {
+        width: 36px !important;
+        height: 36px !important;
+        border: none !important;
+        background: transparent !important;
+    }
 }

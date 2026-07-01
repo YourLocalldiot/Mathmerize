@@ -109,37 +109,57 @@ body {
         border-top: 1px solid #e2e8f0 !important;
         z-index: 50 !important;
         background: #fff;
+        overflow: visible !important;
     }
     
+    /* Hide logo/toggle header */
     #main-sidebar > div:first-child { display: none !important; }
     
+    /* Nav becomes horizontal row */
     #main-sidebar nav {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-evenly;
-        align-items: center;
-        padding: 0;
-        margin: 0;
-        flex: 1;
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: space-evenly !important;
+        align-items: center !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        flex: 1 !important;
+        gap: 0 !important;
+        height: 100% !important;
     }
     
+    /* Reset Tailwind space-y-2 which adds margin-top to 2nd+ children */
+    #main-sidebar nav > * + * {
+        margin-top: 0 !important;
+    }
+    
+    /* Nav links become vertical icon+label */
     #main-sidebar nav a {
         flex-direction: column !important;
         gap: 2px !important;
-        padding: 4px !important;
+        padding: 8px 16px !important;
         justify-content: center !important;
         align-items: center !important;
-        margin-bottom: 0 !important;
+        margin: 0 !important;
         background: none !important;
+        border-radius: 12px !important;
+        white-space: nowrap !important;
+        overflow: visible !important;
+    }
+
+    #main-sidebar nav a.bg-indigo-50 {
+        background: #eef2ff !important;
     }
     
-    #main-sidebar nav a span { 
+    #main-sidebar nav a span,
+    #main-sidebar nav a .sidebar-link-text { 
         display: block !important; 
-        font-size: 0.65rem; 
+        font-size: 0.65rem !important; 
         opacity: 1 !important;
         width: auto !important;
     }
     
+    /* Auth section in bottom bar */
     #auth-container { 
         display: flex !important; 
         align-items: center !important; 
@@ -147,6 +167,7 @@ body {
         padding: 0 16px !important;
         border-top: none !important;
         border-left: 1px solid #e2e8f0 !important;
+        flex-shrink: 0 !important;
     }
     #auth-container .auth-user-text, #auth-container #logout-btn { display: none !important; }
     #auth-container a { padding: 8px !important; justify-content: center !important; width: auto !important; }

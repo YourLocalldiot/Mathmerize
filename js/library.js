@@ -150,10 +150,14 @@ function renderQuizList(quizzes) {
             <div class="quiz-info">
                 <div class="quiz-name">${escapeHtml(q.title)}</div>
                 <div class="quiz-meta">
-                    <span>
-                        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        ${q.questions ? q.questions.length : 0} Qs
-                    </span>
+                    <span>${q.questions ? q.questions.length : 0} Qs</span>
+                </div>
+                <div class="quiz-meta-mobile">
+                    <span>${relativeTime(q.createdAt)}</span>
+                    <span class="meta-dot"></span>
+                    <span>${q.questions ? q.questions.length : 0} Qs</span>
+                    <span class="meta-dot"></span>
+                    <span class="meta-code">${q.code || '—'}</span>
                 </div>
             </div>
 
@@ -171,7 +175,7 @@ function renderQuizList(quizzes) {
             <div class="quiz-actions">
                 <a href="quiz.html?id=${q.id}" class="btn-play">
                     <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                    Play
+                    <span class="play-text">Play</span>
                 </a>
                 <div class="dropdown">
                     <button class="btn-icon" onclick="toggleDropdown(this)" title="More options">
