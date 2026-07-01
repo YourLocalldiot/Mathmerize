@@ -94,3 +94,63 @@ body {
 .action-card:hover .icon-wrapper {
     transform: scale(1.1);
 }
+
+@media (max-width: 768px) {
+    /* Change sidebar to bottom nav on mobile */
+    #main-sidebar {
+        width: 100% !important;
+        height: 64px !important;
+        flex-direction: row !important;
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        top: auto !important;
+        border-right: none !important;
+        border-top: 1px solid #e2e8f0 !important;
+        z-index: 50 !important;
+        background: #fff;
+    }
+    
+    #main-sidebar > div:first-child { display: none !important; }
+    
+    #main-sidebar nav {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-evenly;
+        align-items: center;
+        padding: 0;
+        margin: 0;
+        flex: 1;
+    }
+    
+    #main-sidebar nav a {
+        flex-direction: column !important;
+        gap: 2px !important;
+        padding: 4px !important;
+        justify-content: center !important;
+        align-items: center !important;
+        margin-bottom: 0 !important;
+        background: none !important;
+    }
+    
+    #main-sidebar nav a span { 
+        display: block !important; 
+        font-size: 0.65rem; 
+        opacity: 1 !important;
+        width: auto !important;
+    }
+    
+    #auth-container { 
+        display: flex !important; 
+        align-items: center !important; 
+        justify-content: center !important; 
+        padding: 0 16px !important;
+        border-top: none !important;
+        border-left: 1px solid #e2e8f0 !important;
+    }
+    #auth-container .auth-user-text, #auth-container #logout-btn { display: none !important; }
+    #auth-container a { padding: 8px !important; justify-content: center !important; width: auto !important; }
+    #auth-container a span { display: none !important; }
+    
+    body { padding-bottom: 64px; }
+}
