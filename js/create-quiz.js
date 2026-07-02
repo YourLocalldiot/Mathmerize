@@ -451,12 +451,39 @@ onAuthStateChanged(auth, async (user) => {
 saveBtn.addEventListener('click', saveQuiz);
 
 
-document.getElementById('create-q-btn').addEventListener('click', () => {
-    openEditView(-1);
-});
+const qTypeOverlay = document.getElementById('q-type-overlay');
 
-document.getElementById('add-q-btn').addEventListener('click', () => {
-    openEditView(-1);
+function openQTypeSelection() {
+    qTypeOverlay.classList.remove('hidden');
+    // small delay to allow display:flex to apply before adding class for opacity transition
+    setTimeout(() => qTypeOverlay.classList.add('show'), 10);
+}
+
+function closeQTypeSelection() {
+    qTypeOverlay.classList.remove('show');
+    setTimeout(() => qTypeOverlay.classList.add('hidden'), 300);
+}
+
+document.getElementById('create-q-btn').addEventListener('click', openQTypeSelection);
+document.getElementById('add-q-btn').addEventListener('click', openQTypeSelection);
+document.getElementById('close-q-type-btn').addEventListener('click', closeQTypeSelection);
+
+document.querySelectorAll('.q-type-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        const type = e.currentTarget.dataset.type;
+        closeQTypeSelection();
+        
+        // Only equation is fully implemented right now
+        if (type === 'equation') {
+            setTimeout(() => openEditView(-1), 300);
+        } else {
+            // For now, treat others similarly or show a toast
+            setTimeout(() => {
+                showToast(`Selected type: ${type.replace('_', ' ')} (using equation view)`);
+                openEditView(-1);
+            }, 300);
+        }
+    });
 });
 
 cancelEditBtn.addEventListener('click', closeEditView);

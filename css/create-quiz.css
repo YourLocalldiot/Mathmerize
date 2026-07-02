@@ -530,3 +530,120 @@ body {
     .toolbar-left, .toolbar-right { width: 100%; justify-content: space-between; }
     .quiz-title-input { flex: 1; margin-left: 8px; }
 }
+
+/* Question Type Overlay */
+.q-type-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: flex;
+    justify-content: flex-end;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.q-type-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.q-type-panel {
+    background: #fff;
+    width: 400px;
+    height: 100%;
+    box-shadow: -4px 0 15px rgba(0,0,0,0.1);
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+}
+
+.q-type-overlay.show .q-type-panel {
+    transform: translateX(0);
+}
+
+.q-type-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.q-type-header h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 8px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.close-btn:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+}
+
+.q-type-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.q-type-btn {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.q-type-btn:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    transform: translateY(-2px);
+}
+
+.q-type-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.q-type-btn span {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #334155;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .q-type-panel {
+        width: 100%;
+    }
+}
